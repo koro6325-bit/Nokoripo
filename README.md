@@ -1,5 +1,9 @@
 # 逆算残高メーターアプリ「ノコリポ（Nokoripo）」
 
+### 画面遷移図
+Figma：https://www.figma.com/design/hruEN9FLMIX3NsK3hnhbDz/%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB%E5%9B%B3_%E3%83%8E%E3%82%B3%E3%83%AA%E3%83%9D?node-id=0-1&t=t0RQvp3jAU8eHPH7-1
+
+
 ## 1. サービス概要
 
 - **このサービスはどんなサービスか**
