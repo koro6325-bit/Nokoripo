@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  devise_for :users
   get 'top/index'
   # アプリのトップページ（起動時に開く画面）を指定
   root 'top#index'
