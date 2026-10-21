@@ -1,0 +1,40 @@
+<div class="flex flex-col justify-center items-center h-screen w-full font-sans">
+  <div class="w-full max-w-md mx-auto p-6">
+    <!-- アプリタイトル -->
+    <h1 class="text-3xl mb-8 text-center font-bold">Nokoripo</h1>
+    
+    <!-- フォーム開始（Devise用） -->
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+      <div class="flex flex-col w-full space-y-6">
+        
+        <!-- メールアドレス（ニックネーム）入力欄 -->
+        <div>
+          <label class="block font-bold text-gray-700">メールアドレス</label>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", required: true, class: 'mt-2 p-3 w-full bg-gray-200 border-none rounded' %>
+        </div>
+
+        <!-- パスワード入力欄 -->
+        <div>
+          <label class="block font-bold text-gray-700">パスワード</label>
+          <%= f.password_field :password, autocomplete: "current-password", required: true, class: 'mt-2 p-3 w-full bg-gray-200 border-none rounded' %>
+        </div>
+
+        <!-- ログインボタン -->
+        <div class="pt-4">
+          <%= f.submit "ログイン", class: "w-full py-3 bg-gray-500 hover:bg-gray-600 text-white font-bold rounded cursor-pointer" %>
+        </div>
+        
+        <!-- おためしログインボタン（仮） -->
+        <div>
+          <button type="button" class="w-full py-3 bg-gray-400 hover:bg-gray-500 text-white font-bold rounded cursor-pointer">おためし（ゲストログイン）</button>
+        </div>
+
+      </div>
+    <% end %>
+
+    <!-- トップ画面へ戻るリンク -->
+    <div class="mt-8 text-center">
+      <%= link_to "トップ画面へ戻る", root_path, class: "text-gray-500 underline hover:text-gray-700" %>
+    </div>
+  </div>
+</div>

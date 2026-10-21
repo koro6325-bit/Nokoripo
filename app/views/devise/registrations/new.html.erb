@@ -1,0 +1,44 @@
+<!-- ヘッダー（バナー） -->
+<header style="padding: 15px; background-color: #ccc;">
+  <h2 style="margin: 0;">Nokoripo</h2>
+</header>
+
+<!-- Figmaを意識した中央寄せのレイアウト構造 -->
+<div style="max-width: 400px; margin: 60px auto; padding: 20px; text-align: center; font-family: sans-serif;">
+  
+  <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+
+    <!-- 項目1：ニックネーム（※MVP時は裏側でEmailとして保存します） -->
+    <div style="margin-bottom: 25px; text-align: left;">
+      <label style="display: block; font-weight: bold; margin-bottom: 5px;">ニックネーム</label>
+      <%= f.text_field :email, autofocus: true, autocomplete: "email", style: "width: 100%; padding: 10px; background-color: #e0e0e0; border: none; box-sizing: border-box;" %>
+    </div>
+
+    
+    <!-- 項目2：メールアドレス（※MVP時は裏側でEmailとして保存します） -->
+    <div style="margin-bottom: 25px; text-align: left;">
+      <label style="display: block; font-weight: bold; margin-bottom: 5px;">メールアドレス</label>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email", style: "width: 100%; padding: 10px; background-color: #e0e0e0; border: none; box-sizing: border-box;" %>
+    </div>
+
+    <!-- 項目3：パスワード -->
+    <div style="margin-bottom: 25px; text-align: left;">
+      <label style="display: block; font-weight: bold; margin-bottom: 5px;">パスワード</label>
+      <%= f.password_field :password, autocomplete: "new-password", style: "width: 100%; padding: 10px; background-color: #e0e0e0; border: none; box-sizing: border-box;" %>
+    </div>
+
+    <!-- 項目4：パスワード確認 -->
+    <div style="margin-bottom: 35px; text-align: left;">
+      <label style="display: block; font-weight: bold; margin-bottom: 5px;">パスワード確認</label>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", style: "width: 100%; padding: 10px; background-color: #e0e0e0; border: none; box-sizing: border-box;" %>
+    </div>
+
+    <!-- 新規登録ボタン -->
+    <div>
+      <%= f.submit "新規登録", style: "width: 60%; padding: 12px; background-color: #888; color: white; border: none; font-weight: bold; cursor: pointer;" %>
+    </div>
+  <% end %>
+
+</div>
+
