@@ -23,21 +23,29 @@
     <% end %>
   </div>
 
-  <!-- 出費手動入力フォームの骨組み（Issue #12、#15用） -->
+  <!-- 出費手動入力フォーム（Issue #12の実装） -->
   <div class="bg-gray-50 p-4 rounded mb-6">
     <h3 class="font-bold mb-2">今月の利用額を入力</h3>
-    <div class="mb-4">
-      <input type="number" class="border p-2 w-full" placeholder="金額のみ（例: 1500）">
-    </div>
     
-    <!-- クイック入力ボタンの配置イメージ（あとからHotwire等で連動させます） -->
+    <%= form_with model: @payment, url: payments_path, local: true do |f| %>
+      <div class="mb-4">
+        <!-- 金額入力欄 -->
+        <%= f.number_field :amount, class: "border p-2 w-full", placeholder: "金額のみ（例: 1500）", required: true %>
+      </div>
+
+      <div class="mb-4">
+        <!-- 用途入力欄 -->
+        <%= f.text_field :memo, class: "border p-2 w-full", placeholder: "用途（例: コンビニ）" %>
+      </div>
+
+      <%= f.submit "登録する", class: "bg-blue-500 text-white p-2 rounded w-full mb-4" %>
+    <% end %>
+
+    <!-- クイック入力ボタンの配置イメージ（見た目だけ） -->
     <div class="flex gap-2 mb-4">
       <button class="bg-gray-200 p-2 rounded text-sm">コンビニ 500円</button>
       <button class="bg-gray-200 p-2 rounded text-sm">カフェ 600円</button>
       <button class="bg-gray-200 p-2 rounded text-sm">ランチ 1,200円</button>
     </div>
-
-    <button class="bg-blue-500 text-white p-2 rounded w-full">登録する</button>
   </div>
-</div>
 
