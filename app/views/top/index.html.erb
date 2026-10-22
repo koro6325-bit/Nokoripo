@@ -23,7 +23,8 @@
   <div>
     <% if user_signed_in? %>
       <!-- ログインしていたら、メイン画面（ダッシュボード等）へのボタンにする -->
-      <%= link_to "メーターへ移動", "#", style: "padding: 10px 20px; background: #bbb; border: 1px solid #000; text-decoration: none;" %>
+      <%= link_to 'メーターへ移動', dashboard_path, class: 'btn btn-primary' %>
+
     <% else %>
       <!-- 画面遷移図通り：メーターをつくるボタン（新規登録へ） -->
       <%= link_to "メーターをつくる", new_user_registration_path, style: "padding: 10px 20px; background: #bbb; border: 1px solid #000; text-decoration: none;" %>

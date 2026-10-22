@@ -1,9 +1,15 @@
 Rails.application.routes.draw do
-  devise_for :users
-  get 'top/index'
-  # アプリのトップページ（起動時に開く画面）を指定
+  # 未ログイン時のトップ画面
   root 'top#index'
-  
-  # トップページ以外の静的アクションが自動生成された記述（あればそのままでOK）
-  get "top/index"
+
+  # Deviseの登録（registrations）コントローラをカスタム用に指定
+  devise_for :users, controllers: {
+    registrations: 'users/registrations'
+  }
+
+  # 新規登録後の初期設定ステップ用ルーティング
+  resources :registrations_steps, only: [:show, :update]
+
+  # メイン画面（ダッシュボード・メーター画面）
+  resource :dashboard, only: [:show]
 end

@@ -1,0 +1,607 @@
+{
+  "$schema": "https://raw.githubusercontent.com/simplecov-ruby/simplecov/main/schemas/coverage-v1.3.schema.json",
+  "meta": {
+    "schema_version": "1.3",
+    "simplecov_version": "1.2.0",
+    "command_name": "RSpec",
+    "command_names": [
+      "RSpec"
+    ],
+    "project_name": "Nokoripo",
+    "timestamp": "2026-10-22T01:53:07.296+00:00",
+    "root": "/nokoripo",
+    "commit": null,
+    "primary_coverage": "line",
+    "line_coverage": true,
+    "branch_coverage": false,
+    "method_coverage": false
+  },
+  "total": {
+    "lines": {
+      "covered": 0,
+      "missed": 52,
+      "omitted": 56,
+      "total": 52,
+      "percent": 0.0,
+      "strength": 0.0
+    }
+  },
+  "coverage": {
+    "app/controllers/application_controller.rb": {
+      "source": [
+        "class ApplicationController < ActionController::Base",
+        "end"
+      ],
+      "lines": [
+        0,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 1,
+      "omitted_lines": 1,
+      "total_lines": 1
+    },
+    "app/controllers/dashboards_controller.rb": {
+      "source": [
+        "# app/controllers/dashboards_controller.rb",
+        "class DashboardsController < ApplicationController",
+        "  before_action :authenticate_user! # ログイン必須",
+        "",
+        "  def show",
+        "    @user = current_user",
+        "    ",
+        "    # 1. ユーザーが現在アクティブにしている目標（モチベ）を1つ取得",
+        "    @active_target = @user.targets.find_by(is_active: true)",
+        "    ",
+        "    # 2. ユーザーが今月使ったお金（payments）の合計額を計算",
+        "    # ※月跨ぎ自動リセットの考慮：Rails側で当月（今月1日〜末日）のデータのみを合計する",
+        "    @total_payments_amount = @user.payments.where(date: Time.current.all_month).sum(:amount)",
+        "    ",
+        "    # 3. 逆算残高メーターの演算ロジック（READMEより）",
+        "    # 残高 ＝ 当月の自由なお金 － 目標予算 － 今月の利用額合計",
+        "    if @active_target",
+        "      @remaining_hp = (@user.monthly_allowance || 0) - (@active_target.total_budget || 0) - @total_payments_amount",
+        "    else",
+        "      @remaining_hp = (@user.monthly_allowance || 0) - @total_payments_amount",
+        "    end",
+        "",
+        "    # 新しく出費を入力するための空のオブジェクトを用意（Issue #12用）",
+        "    @payment = @user.payments.build",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        null,
+        0,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null,
+        0,
+        null,
+        null,
+        null,
+        0,
+        null,
+        null,
+        null,
+        0,
+        0,
+        null,
+        0,
+        null,
+        null,
+        null,
+        0,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 10,
+      "omitted_lines": 16,
+      "total_lines": 10
+    },
+    "app/controllers/registrations_steps_controller.rb": {
+      "source": [
+        "# app/controllers/registrations_steps_controller.rb",
+        "class RegistrationsStepsController < ApplicationController",
+        "  before_action :authenticate_user!",
+        "",
+        "  def show",
+        "    @user = current_user",
+        "    case params[:id]",
+        "    when 'allowance'",
+        "      render 'allowance'",
+        "    when 'target'",
+        "      @target = @user.targets.build",
+        "      render 'target'",
+        "    else",
+        "      redirect_to root_path",
+        "    end",
+        "  end",
+        "",
+        "  def update",
+        "    @user = current_user",
+        "    case params[:id]",
+        "    when 'allowance'",
+        "      if @user.update(user_params)",
+        "        redirect_to registrations_step_path(:target)",
+        "      else",
+        "        render 'allowance', status: :unprocessable_entity",
+        "      end",
+        "    when 'target'",
+        "      @target = @user.targets.build(target_params)",
+        "      if @target.save",
+        "        redirect_to dashboard_path",
+        "      else",
+        "        render 'target', status: :unprocessable_entity",
+        "      end",
+        "    end",
+        "  end",
+        "",
+        "  private",
+        "",
+        "  def user_params",
+        "    params.require(:user).permit(:monthly_allowance)",
+        "  end",
+        "",
+        "  def target_params",
+        "    params.require(:target).permit(:name, :total_budget, :deadline).merge(is_active: true)",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        null,
+        0,
+        0,
+        null,
+        0,
+        0,
+        0,
+        null,
+        0,
+        null,
+        0,
+        0,
+        null,
+        0,
+        null,
+        null,
+        null,
+        0,
+        0,
+        0,
+        null,
+        0,
+        0,
+        null,
+        0,
+        null,
+        null,
+        0,
+        0,
+        0,
+        null,
+        0,
+        null,
+        null,
+        null,
+        null,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 24,
+      "omitted_lines": 22,
+      "total_lines": 24
+    },
+    "app/controllers/top_controller.rb": {
+      "source": [
+        "class TopController < ApplicationController",
+        "  def index",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        0,
+        0,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 2,
+      "omitted_lines": 2,
+      "total_lines": 2
+    },
+    "app/controllers/users/registrations_controller.rb": {
+      "source": [
+        "# app/controllers/users/registrations_controller.rb",
+        "class Users::RegistrationsController < Devise::RegistrationsController",
+        "  protected",
+        "",
+        "  # サインアップ（アカウント作成）成功後のリダイレクト先をステップ1へ",
+        "  def after_sign_up_path_for(resource)",
+        "    registrations_step_path(:allowance)",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        null,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 4,
+      "omitted_lines": 5,
+      "total_lines": 4
+    },
+    "app/helpers/application_helper.rb": {
+      "source": [
+        "module ApplicationHelper",
+        "end"
+      ],
+      "lines": [
+        0,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 1,
+      "omitted_lines": 1,
+      "total_lines": 1
+    },
+    "app/helpers/top_helper.rb": {
+      "source": [
+        "module TopHelper",
+        "end"
+      ],
+      "lines": [
+        0,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 1,
+      "omitted_lines": 1,
+      "total_lines": 1
+    },
+    "app/models/application_record.rb": {
+      "source": [
+        "class ApplicationRecord < ActiveRecord::Base",
+        "  primary_abstract_class",
+        "end"
+      ],
+      "lines": [
+        0,
+        0,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 2,
+      "omitted_lines": 1,
+      "total_lines": 2
+    },
+    "app/models/payment.rb": {
+      "source": [
+        "class Payment < ApplicationRecord",
+        "  belongs_to :user",
+        "end"
+      ],
+      "lines": [
+        0,
+        0,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 2,
+      "omitted_lines": 1,
+      "total_lines": 2
+    },
+    "app/models/target.rb": {
+      "source": [
+        "class Target < ApplicationRecord",
+        "  belongs_to :user",
+        "end"
+      ],
+      "lines": [
+        0,
+        0,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 2,
+      "omitted_lines": 1,
+      "total_lines": 2
+    },
+    "app/models/user.rb": {
+      "source": [
+        "class User < ApplicationRecord",
+        "  # Include default devise modules. Others available are:",
+        "  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable",
+        "  devise :database_authenticatable, :registerable,",
+        "         :recoverable, :rememberable, :validatable",
+        "",
+        " has_many :targets, dependent: :destroy",
+        "end"
+      ],
+      "lines": [
+        0,
+        null,
+        null,
+        0,
+        null,
+        null,
+        0,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 3,
+      "omitted_lines": 5,
+      "total_lines": 3
+    }
+  },
+  "groups": {
+    "Controllers": {
+      "lines": {
+        "covered": 0,
+        "missed": 41,
+        "omitted": 46,
+        "total": 41,
+        "percent": 0.0,
+        "strength": 0.0
+      },
+      "files": [
+        "app/controllers/application_controller.rb",
+        "app/controllers/dashboards_controller.rb",
+        "app/controllers/registrations_steps_controller.rb",
+        "app/controllers/top_controller.rb",
+        "app/controllers/users/registrations_controller.rb"
+      ]
+    },
+    "Channels": {
+      "lines": {
+        "covered": 0,
+        "missed": 0,
+        "omitted": 0,
+        "total": 0,
+        "percent": 100.0,
+        "strength": 0.0
+      },
+      "files": []
+    },
+    "Models": {
+      "lines": {
+        "covered": 0,
+        "missed": 9,
+        "omitted": 8,
+        "total": 9,
+        "percent": 0.0,
+        "strength": 0.0
+      },
+      "files": [
+        "app/models/application_record.rb",
+        "app/models/payment.rb",
+        "app/models/target.rb",
+        "app/models/user.rb"
+      ]
+    },
+    "Mailers": {
+      "lines": {
+        "covered": 0,
+        "missed": 0,
+        "omitted": 0,
+        "total": 0,
+        "percent": 100.0,
+        "strength": 0.0
+      },
+      "files": []
+    },
+    "Helpers": {
+      "lines": {
+        "covered": 0,
+        "missed": 2,
+        "omitted": 2,
+        "total": 2,
+        "percent": 0.0,
+        "strength": 0.0
+      },
+      "files": [
+        "app/helpers/application_helper.rb",
+        "app/helpers/top_helper.rb"
+      ]
+    },
+    "Views": {
+      "lines": {
+        "covered": 0,
+        "missed": 0,
+        "omitted": 0,
+        "total": 0,
+        "percent": 100.0,
+        "strength": 0.0
+      },
+      "files": []
+    },
+    "Jobs": {
+      "lines": {
+        "covered": 0,
+        "missed": 0,
+        "omitted": 0,
+        "total": 0,
+        "percent": 100.0,
+        "strength": 0.0
+      },
+      "files": []
+    },
+    "Libraries": {
+      "lines": {
+        "covered": 0,
+        "missed": 0,
+        "omitted": 0,
+        "total": 0,
+        "percent": 100.0,
+        "strength": 0.0
+      },
+      "files": []
+    }
+  },
+  "errors": {},
+  "history": [
+    {
+      "created_at": "2026-10-22T01:22:43Z",
+      "branch": null,
+      "commit": null,
+      "totals": {
+        "line": 0.0
+      },
+      "groups": {
+        "Controllers": {
+          "line": 0.0
+        },
+        "Channels": {
+          "line": 100.0
+        },
+        "Models": {
+          "line": 0.0
+        },
+        "Mailers": {
+          "line": 100.0
+        },
+        "Helpers": {
+          "line": 0.0
+        },
+        "Views": {
+          "line": 100.0
+        },
+        "Jobs": {
+          "line": 100.0
+        },
+        "Libraries": {
+          "line": 100.0
+        }
+      },
+      "files": {
+        "app/controllers/application_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/registrations_steps_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/top_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/registrations_controller.rb": {
+          "line": 0.0
+        },
+        "app/helpers/application_helper.rb": {
+          "line": 0.0
+        },
+        "app/helpers/top_helper.rb": {
+          "line": 0.0
+        },
+        "app/models/application_record.rb": {
+          "line": 0.0
+        },
+        "app/models/target.rb": {
+          "line": 0.0
+        },
+        "app/models/user.rb": {
+          "line": 0.0
+        }
+      }
+    },
+    {
+      "created_at": "2026-10-22T01:53:07Z",
+      "branch": null,
+      "commit": null,
+      "totals": {
+        "line": 0.0
+      },
+      "groups": {
+        "Controllers": {
+          "line": 0.0
+        },
+        "Channels": {
+          "line": 100.0
+        },
+        "Models": {
+          "line": 0.0
+        },
+        "Mailers": {
+          "line": 100.0
+        },
+        "Helpers": {
+          "line": 0.0
+        },
+        "Views": {
+          "line": 100.0
+        },
+        "Jobs": {
+          "line": 100.0
+        },
+        "Libraries": {
+          "line": 100.0
+        }
+      },
+      "files": {
+        "app/controllers/application_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/dashboards_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/registrations_steps_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/top_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/registrations_controller.rb": {
+          "line": 0.0
+        },
+        "app/helpers/application_helper.rb": {
+          "line": 0.0
+        },
+        "app/helpers/top_helper.rb": {
+          "line": 0.0
+        },
+        "app/models/application_record.rb": {
+          "line": 0.0
+        },
+        "app/models/payment.rb": {
+          "line": 0.0
+        },
+        "app/models/target.rb": {
+          "line": 0.0
+        },
+        "app/models/user.rb": {
+          "line": 0.0
+        }
+      }
+    }
+  ]
+}

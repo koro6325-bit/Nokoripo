@@ -12,6 +12,8 @@ gem 'stimulus-rails'
 gem 'jbuilder'
 gem 'bootsnap', require: false
 gem 'devise'
+gem 'json', '< 3.0'
+
 
 gem 'tzinfo-data', platforms: %i[ windows jruby ]
 

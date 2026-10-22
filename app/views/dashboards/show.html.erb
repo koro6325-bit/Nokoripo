@@ -1,0 +1,43 @@
+<!-- app/views/dashboards/show.html.erb -->
+<div class="container mx-auto p-4">
+  <div class="flex justify-between items-center mb-6 bg-gray-100 p-4 rounded">
+    <h1 class="text-xl font-bold">Nokoripo</h1>
+    <div>
+  <span class="mr-4">ユーザー名: <%= @user.name || "ゲスト" %></span>
+  <!-- 💡 data: { turbo_method: :delete } を追加してRails 7の仕様に合わせます -->
+  <%= link_to "ログアウト", destroy_user_session_path, data: { turbo_method: :delete }, class: "text-red-500" %>
+</div>
+  </div>
+
+  <!-- メーター表示エリア（骨組み） -->
+  <div class="bg-white p-6 rounded shadow mb-6 text-center">
+    <% if @remaining_hp < 0 %>
+      <!-- 予算オーバー時の警告色（赤文字）表示切り替えロジック -->
+      <h2 class="text-2xl font-bold text-red-600 mb-2">予算オーバーしちゃってるよ！無駄遣いを控えよう！</h2>
+      <!-- 💡 to_s から to_fs に修正しました -->
+      <div class="text-4xl font-extrabold text-red-600"><%= @remaining_hp.to_fs(:delimited) %> 円</div>
+    <% else %>
+      <!-- 💡 to_s から to_fs に修正しました -->
+      <h2 class="text-2xl font-bold text-green-600 mb-2">今月はまだ <%= @total_payments_amount.to_fs(:delimited) %> 円しか使ってないよ！</h2>
+      <div class="text-4xl font-extrabold text-green-600">残りHP: <%= @remaining_hp.to_fs(:delimited) %> 円</div>
+    <% end %>
+  </div>
+
+  <!-- 出費手動入力フォームの骨組み（Issue #12、#15用） -->
+  <div class="bg-gray-50 p-4 rounded mb-6">
+    <h3 class="font-bold mb-2">今月の利用額を入力</h3>
+    <div class="mb-4">
+      <input type="number" class="border p-2 w-full" placeholder="金額のみ（例: 1500）">
+    </div>
+    
+    <!-- クイック入力ボタンの配置イメージ（あとからHotwire等で連動させます） -->
+    <div class="flex gap-2 mb-4">
+      <button class="bg-gray-200 p-2 rounded text-sm">コンビニ 500円</button>
+      <button class="bg-gray-200 p-2 rounded text-sm">カフェ 600円</button>
+      <button class="bg-gray-200 p-2 rounded text-sm">ランチ 1,200円</button>
+    </div>
+
+    <button class="bg-blue-500 text-white p-2 rounded w-full">登録する</button>
+  </div>
+</div>
+

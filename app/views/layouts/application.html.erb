@@ -9,7 +9,13 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   </head>
 
-  <body>
-    <%= yield %>
-  </body>
+<body>
+  <% flash.each do |key, value| %>
+    <div class="flash <%= key %>" style="background-color: #d1e7dd; color: #0f5132; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+      <%= value %>
+    </div>
+  <% end %>
+
+  <%= yield %>
+</body>
 </html>
