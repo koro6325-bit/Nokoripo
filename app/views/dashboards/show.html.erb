@@ -1,51 +1,108 @@
-<!-- app/views/dashboards/show.html.erb -->
-<div class="container mx-auto p-4">
-  <div class="flex justify-between items-center mb-6 bg-gray-100 p-4 rounded">
-    <h1 class="text-xl font-bold">Nokoripo</h1>
-    <div>
-  <span class="mr-4">ユーザー名: <%= @user.name || "ゲスト" %></span>
-  <!-- 💡 data: { turbo_method: :delete } を追加してRails 7の仕様に合わせます -->
-  <%= link_to "ログアウト", destroy_user_session_path, data: { turbo_method: :delete }, class: "text-red-500" %>
-</div>
-  </div>
-
-  <!-- メーター表示エリア（骨組み） -->
-  <div class="bg-white p-6 rounded shadow mb-6 text-center">
-    <% if @remaining_hp < 0 %>
-      <!-- 予算オーバー時の警告色（赤文字）表示切り替えロジック -->
-      <h2 class="text-2xl font-bold text-red-600 mb-2">予算オーバーしちゃってるよ！無駄遣いを控えよう！</h2>
-      <!-- 💡 to_s から to_fs に修正しました -->
-      <div class="text-4xl font-extrabold text-red-600"><%= @remaining_hp.to_fs(:delimited) %> 円</div>
-    <% else %>
-      <!-- 💡 to_s から to_fs に修正しました -->
-      <h2 class="text-2xl font-bold text-green-600 mb-2">今月はまだ <%= @total_payments_amount.to_fs(:delimited) %> 円しか使ってないよ！</h2>
-      <div class="text-4xl font-extrabold text-green-600">残りHP: <%= @remaining_hp.to_fs(:delimited) %> 円</div>
-    <% end %>
-  </div>
-
-  <!-- 出費手動入力フォーム（Issue #12の実装） -->
-  <div class="bg-gray-50 p-4 rounded mb-6">
-    <h3 class="font-bold mb-2">今月の利用額を入力</h3>
-    
-    <%= form_with model: @payment, url: payments_path, local: true do |f| %>
-      <div class="mb-4">
-        <!-- 金額入力欄 -->
-        <%= f.number_field :amount, class: "border p-2 w-full", placeholder: "金額のみ（例: 1500）", required: true %>
-      </div>
-
-      <div class="mb-4">
-        <!-- 用途入力欄 -->
-        <%= f.text_field :memo, class: "border p-2 w-full", placeholder: "用途（例: コンビニ）" %>
-      </div>
-
-      <%= f.submit "登録する", class: "bg-blue-500 text-white p-2 rounded w-full mb-4" %>
-    <% end %>
-
-    <!-- クイック入力ボタンの配置イメージ（見た目だけ） -->
-    <div class="flex gap-2 mb-4">
-      <button class="bg-gray-200 p-2 rounded text-sm">コンビニ 500円</button>
-      <button class="bg-gray-200 p-2 rounded text-sm">カフェ 600円</button>
-      <button class="bg-gray-200 p-2 rounded text-sm">ランチ 1,200円</button>
+<div class="container mx-auto p-4" style="max-width: 600px; font-family: sans-serif; color: #374151;">
+  
+  <!-- ヘッダーエリア -->
+  <div class="flex justify-between items-center mb-6 p-4 rounded" style="background-color: #f3f4f6; display: flex; justify-content: space-between; align-items: center; border-radius: 0.5rem;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <h1 class="text-xl font-bold" style="margin: 0; font-size: 1.25rem;">Nokoripo</h1>
+      <span style="font-size: 0.875rem; color: #6b7280;">ユーザー名: <%= @user.nickname || "ゲスト" %></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <!-- 💡 「今月の設定を修正」ボタン -->
+      <%= link_to "今月の設定を修正", registrations_step_path('allowance'), style: "background-color: #ffffff; color: #374151; border: 1px solid #d1d5db; padding: 0.375rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem; text-decoration: none; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.05);" %>
+      <%= link_to "ログアウト", destroy_user_session_path, data: { turbo_method: :delete }, style: "color: #ef4444; text-decoration: none; font-size: 0.875rem;" %>
     </div>
   </div>
+
+ 
+  <div id="meter-section">
+    <!-- メーター表示エリア -->
+    <div class="bg-white p-6 rounded shadow mb-6 text-center" style="background-color: #ffffff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; text-align: center;">
+      <% allowance = @user.monthly_allowance || 0 %>
+      
+      <% if @remaining_hp < 0 %>
+        <h2 style="color: #dc2626; font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: bold;">予算オーバーしちゃってるよ！無駄遣いを控えよう！</h2>
+        <div style="color: #dc2626; font-size: 2.25rem; font-weight: 800; margin-bottom: 1.5rem;"><%= @remaining_hp.to_fs(:delimited) %> 円</div>
+      <% else %>
+        <h2 style="color: #16a34a; font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: bold;">今月はまだ <%= @total_payments_amount.to_fs(:delimited) %> 円しか使ってないよ！</h2>
+        <div style="color: #16a34a; font-size: 2.25rem; font-weight: 800; margin-bottom: 1.5rem;">残りHP: <%= @remaining_hp.to_fs(:delimited) %> 円</div>
+      <% end %>
+
+      <!-- 視覚的メーターバー -->
+      <% progress_percentage = allowance > 0 ? ([(@total_payments_amount.to_f / allowance) * 100, 100].min) : 0 %>
+      <div style="position: relative; width: 100%; background-color: #e5e7eb; height: 24px; border-radius: 9999px; overflow: hidden; margin: 1.5rem 0;">
+        <div style="width: <%= progress_percentage %>%; height: 100%; background-color: <%= @remaining_hp < 0 ? '#ef4444' : '#10b981' %>; transition: width 0.5s ease;">
+        </div>
+      </div>
+
+      <!-- メーターの下の金額・警告ラベル -->
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; font-weight: bold; color: #4b5563;">
+        <div>0 円</div>
+        <div style="color: #d97706; font-size: 0.75rem; display: flex; align-items: center; gap: 4px;">
+          <span>⚠️ ここからピンチ</span>
+        </div>
+        <div><%= allowance.to_fs(:delimited) %> 円</div>
+      </div>
+    </div>
+
+    <!-- 📝 今月の利用履歴一覧（ここに入れておくことで自動で一緒に増減します） -->
+    <div style="background-color: #ffffff; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
+      <h3 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.125rem; font-weight: bold;">📝 今月の利用履歴</h3>
+      <% if @user.payments.any? %>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          <% @user.payments.order(created_at: :desc).each do |payment| %>
+            <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6;">
+              <div>
+                <span style="font-weight: bold; margin-right: 0.5rem;"><%= payment.amount.to_fs(:delimited) %> 円</span>
+                <span style="color: #6b7280; font-size: 0.875rem;"><%= payment.memo.presence || "用途なし" %></span>
+              </div>
+              <%= button_to "削除", payment_path(payment), method: :delete, form: { data: { turbo_confirm: "本当に削除しますか？" } }, style: "background: none; border: none; color: #ef4444; font-size: 0.875rem; cursor: pointer; padding: 0;" %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p style="color: #9ca3af; font-size: 0.875rem; text-align: center; margin: 1rem 0;">まだ今月の利用記録はありません。</p>
+      <% end %>
+    </div>
+  </div>
+  <!-- 💡 Turboエリアの終了位置 -->
+
+  <!-- 出費手動入力フォーム -->
+  <div class="bg-gray-50 p-4 rounded mb-6" style="background-color: #f9fafb; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+    <h3 class="font-bold mb-4" style="margin-top: 0; margin-bottom: 1rem; font-size: 1.125rem;">今月の利用額を入力</h3>
+    
+    <%= form_with model: @payment, url: payments_path, local: true do |f| %>
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.875rem; font-weight: bold; margin-bottom: 0.25rem; color: #374151;">金額</label>
+        <%= f.number_field :amount, style: "border: 1px solid #d1d5db; padding: 0.5rem; width: 100%; border-radius: 0.25rem; box-sizing: border-box;", placeholder: "金額のみ（例: 1500）", required: true %>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.875rem; font-weight: bold; margin-bottom: 0.25rem; color: #374151;">用途</label>
+        <%= f.text_field :memo, style: "border: 1px solid #d1d5db; padding: 0.5rem; width: 100%; border-radius: 0.25rem; box-sizing: border-box;", placeholder: "用途（例: コンビニ）" %>
+      </div>
+
+      <%= f.submit "登録する", style: "background-color: #3b82f6; color: white; padding: 0.75rem; border: none; border-radius: 0.25rem; width: 100%; font-weight: bold; cursor: pointer; font-size: 1rem;" %>
+    <% end %>
+
+    <label style="display: block; font-size: 0.875rem; font-weight: bold; margin-bottom: 0.5rem; color: #374151; margin-top: 1rem;">クイック入力</label>
+<div style="display: flex; gap: 8px; flex-wrap: wrap;">
+  <button type="button" onclick="fillForm(500, 'コンビニ')" style="background-color: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer; font-weight: 500; color: #374151;">コンビニ 500円</button>
+  <button type="button" onclick="fillForm(600, 'カフェ')" style="background-color: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer; font-weight: 500; color: #374151;">カフェ 600円</button>
+  <button type="button" onclick="fillForm(1200, 'ランチ')" style="background-color: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer; font-weight: 500; color: #374151;">ランチ 1,200円</button>
+</div>
+
+
+<script>
+  function fillForm(amount, memo) {
+    // フォーム内にある金額入力欄と用途入力欄の要素を自動で探
+    const amountField = document.querySelector('input[type="number"]');
+    const memoField = document.querySelector('input[type="text"]');
+
+    if (amountField) amountField.value = amount;
+    if (memoField) memoField.value = memo;
+  }
+</script>
+
+</div>
+
 

@@ -1,0 +1,27 @@
+<%# app/views/payments/create.turbo_stream.erb %>
+
+<!-- メーターエリア（ID: meter-section）を、最新のshow.html.erbの内容で丸ごと差し替える指示 -->
+<%= turbo_stream.replace "meter-section" do %>
+  <div id="meter-section">
+    <div class="bg-white p-6 rounded shadow mb-6 text-center" style="background-color: #ffffff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; text-align: center;">
+      <% allowance = @user.monthly_allowance || 0 %>
+      <% if @remaining_hp < 0 %>
+        <h2 style="color: #dc2626; font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: bold;">予算オーバーしちゃってるよ！無駄遣いを控えよう！</h2>
+        <div style="color: #dc2626; font-size: 2.25rem; font-weight: 800; margin-bottom: 1.5rem;"><%= @remaining_hp.to_fs(:delimited) %> 円</div>
+      <% else %>
+        <h2 style="color: #16a34a; font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: bold;">今月はまだ <%= @total_payments_amount.to_fs(:delimited) %> 円しか使ってないよ！</h2>
+        <div style="color: #16a34a; font-size: 2.25rem; font-weight: 800; margin-bottom: 1.5rem;">残りHP: <%= @remaining_hp.to_fs(:delimited) %> 円</div>
+      <% end %>
+      <% progress_percentage = allowance > 0 ? ([(@total_payments_amount.to_f / allowance) * 100, 100].min) : 0 %>
+      <div style="position: relative; width: 100%; background-color: #e5e7eb; height: 24px; border-radius: 9999px; overflow: hidden; margin: 1.5rem 0;">
+        <div style="width: <%= progress_percentage %>%; height: 100%; background-color: <%= @remaining_hp < 0 ? '#ef4444' : '#10b981' %>; transition: width 0.5s ease;">
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; font-weight: bold; color: #4b5563;">
+        <div>0 円</div>
+        <div style="color: #d97706; font-size: 0.75rem; display: flex; align-items: center; gap: 4px;"><span>⚠️ ここからピンチ</span></div>
+        <div><%= allowance.to_fs(:delimited) %> 円</div>
+      </div>
+    </div>
+  </div>
+<% end %>

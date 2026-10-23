@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   resource :dashboard, only: [:show]
   
   
-  resources :payments, only: [:create]
+  resources :payments, only: [:create, :destroy] # 👈 :destroy を追記
+
 end
 

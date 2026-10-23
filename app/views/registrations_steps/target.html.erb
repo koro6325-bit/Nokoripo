@@ -1,73 +1,69 @@
-<!-- app/views/registrations_steps/target.html.erb -->
-<div class="container mx-auto p-4" style="max-width: 500px; margin-top: 40px;">
-  <p class="text-sm text-gray-500">ステップ 2 / 2</p>
+<div class="container mx-auto p-4" style="max-width: 600px; font-family: sans-serif; color: #374151; padding-top: 2rem;">
   
-  <div class="card bg-white p-6 rounded shadow-lg border mt-2">
+  <!-- ステップ表示 -->
+  <div style="font-size: 0.875rem; color: #9ca3af; text-align: center; margin-bottom: 1rem; font-weight: bold;">
+    ステップ 2 / 2
+  </div>
+
+  <%= form_with model: @target, url: registrations_step_path('target'), method: :patch, local: true do |f| %>
     
-    <!-- エラー表示エリア -->
+    <!-- Rails標準のエラーポップアップ表示エリア（バリデーションエラー時） -->
     <% if @target.errors.any? %>
-      <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
-        <ul>
-          <% @target.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
-          <% end %>
-        </ul>
-      </div>
+      <script>
+        alert("<%= j @target.errors.full_messages.join('\n') %>");
+      </script>
     <% end %>
 
-    <%= form_with model: @target, url: registrations_step_path(:target), method: :patch, local: true do |f| %>
+    <!-- 中央のホワイトカード -->
+    <div style="background-color: #ffffff; padding: 2.5rem 2rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 2rem;">
       
-      <!-- 1. 目標の名前入力欄 -->
-      <div class="mb-6">
-        <%= f.label :name, "目標", class: "block font-bold mb-2 text-gray-700" %>
-        <%= f.text_field :name, class: "border p-2 w-full rounded", placeholder: "12月の旅行", required: true %>
+      <!-- 1. 目標名前フォーム -->
+      <div style="margin-bottom: 2rem; display: flex; flex-direction: column; align-items: flex-start; max-width: 400px; margin-left: auto; margin-right: auto;">
+        <label style="font-weight: bold; font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          目標
+        </label>
+        <%= f.text_field :name, style: "border: 1px solid #d1d5db; padding: 0.625rem; width: 100%; border-radius: 9999px; box-sizing: border-box; text-align: center; font-size: 0.95rem;", placeholder: "12月の旅行" %>
       </div>
 
-      <!-- 2. 死守する金額（総予算）の表示とスライダー -->
-      <div class="mb-6 text-center">
-        <label class="block font-bold mb-2 text-left text-gray-700">死守する金額</label>
-        
-        <!-- 金額を大きく表示するエリア（初期値10万円） -->
-        <div class="text-3xl font-black my-4 text-gray-800">
-          <span id="budget-offset-val">10</span>万円
-        </div>
-
-        <!-- Figma仕様のスライダーUI（5万〜15万などの調整用、裏側で数値を送るためのもの） -->
-        <!-- ※一旦手入力用の隠しフォーム（hidden）か、スライダー自体を数値入力の箱として扱います -->
-        <%= f.range_field :total_budget, min: 10000, max: 300000, step: 10000, value: 100000, class: "w-full cursor-pointer", id: "budget-slider" %>
-        
-        <div class="flex justify-between text-xs text-gray-400 mt-1">
-          <span>1万円</span>
-          <span>30万円</span>
+      <!-- 2. 死守する金額表示（スライダーと連動） -->
+      <div style="text-align: center; margin-bottom: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 1.5rem;">
+        <span style="font-weight: bold; font-size: 1rem; color: #374151;">死守する金額</span>
+        <div>
+          <span id="display-target-amount" style="font-size: 2.25rem; font-weight: 800; color: #111827;">50,000</span>
+          <span style="font-size: 1.25rem; font-weight: bold; color: #111827; margin-left: 0.25rem;">円</span>
         </div>
       </div>
 
-      <!-- 3. 目標期限（Figmaの裏側や今後のために今日の日付などを仮で送るか、フォームを隠し持ちます） -->
-      <%= f.hidden_field :deadline, value: Time.current.to_date + 1.month %>
-
-      <!-- ボタンエリア -->
-      <div class="mt-8">
-        <%= f.submit "決定", class: "w-full bg-gray-400 text-white font-bold p-3 rounded hover:bg-gray-500 mb-3 cursor-pointer" %>
+      <!-- 💡 死守する金額のスライダーUI（1万円〜20万円まで5,000円刻み） -->
+      <div style="margin-bottom: 1.5rem; padding: 0 2rem;">
+        <%= f.range_field :total_budget, id: "target-slider", min: 10000, max: 200000, step: 5000, value: @target.total_budget || 50000, style: "width: 100%; accent-color: #3b82f6; cursor: pointer; height: 6px; background: #e5e7eb; border-radius: 9999px;" %>
       </div>
+    </div>
 
-    <% end %>
-  </div>
+    <!-- 下部ナビゲーションボタン（決定・戻る） -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 250px; margin: 0 auto;">
+      <%= f.submit "決定", style: "background-color: #e5e7eb; color: #374151; padding: 0.75rem; border: none; border-radius: 0.25rem; font-weight: bold; cursor: pointer; font-size: 1rem; width: 100%; text-align: center;" %>
+      <%= link_to "戻る", registrations_step_path('allowance'), style: "background-color: #e5e7eb; color: #374151; padding: 0.75rem; border-radius: 0.25rem; font-weight: bold; text-decoration: none; font-size: 1rem; width: 100%; text-align: center; box-sizing: border-box;" %>
+    </div>
 
-  <div class="text-center mt-4">
-    <%= link_to "戻る", registrations_step_path(:allowance), class: "text-gray-500 underline text-sm" %>
-  </div>
+  <% end %>
 </div>
 
-<!-- スライダーの数字を画面の「○○万円」に連動させる簡易JavaScript（あとからHotwire等に置き換えてもOKです！） -->
+<!-- 💡 スライダーの数値をリアルタイム連動させるJavaScript -->
 <script>
-  document.addEventListener("turbo:load", () => {
-    const slider = document.getElementById("budget-slider");
-    const display = document.getElementById("budget-offset-val");
-    if (slider && display) {
-      slider.addEventListener("input", (e) => {
-        const manYen = Math.floor(e.target.value / 10000);
-        display.textContent = manYen;
-      });
-    }
+  const targetSlider = document.getElementById('target-slider');
+  const targetDisplay = document.getElementById('display-target-amount');
+
+  function formatNumber(num) {
+    return Number(num).toLocaleString();
+  }
+
+  targetSlider.addEventListener('input', (e) => {
+    targetDisplay.textContent = formatNumber(e.target.value);
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    targetDisplay.textContent = formatNumber(targetSlider.value);
   });
 </script>
+
