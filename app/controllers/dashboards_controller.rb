@@ -1,26 +1,23 @@
-# app/controllers/dashboards_controller.rb
 class DashboardsController < ApplicationController
-  before_action :authenticate_user! # ログイン必須
+  before_action :authenticate_user!
 
   def show
     @user = current_user
-    
-    # 1. ユーザーが現在アクティブにしている目標（モチベ）を1つ取得
-    @active_target = @user.targets.find_by(is_active: true)
-    
-    # 2. ユーザーが今月使ったお金（payments）の合計額を計算
-    # ※月跨ぎ自動リセットの考慮：Rails側で当月（今月1日〜末日）のデータのみを合計する
-    @total_payments_amount = @user.payments.where(date: Time.current.all_month).sum(:amount)
-    
-    # 3. 逆算残高メーターの演算ロジック（READMEより）
-    # 残高 ＝ 当月の自由なお金 － 目標予算 － 今月の利用額合計
-    if @active_target
-      @remaining_hp = (@user.monthly_allowance || 0) - (@active_target.total_budget || 0) - @total_payments_amount
-    else
-      @remaining_hp = (@user.monthly_allowance || 0) - @total_payments_amount
-    end
+    @payment = Payment.new # フォーム用
 
-    # 新しく出費を入力するための空のオブジェクトを用意（Issue #12用）
-    @payment = @user.payments.build
+    # 1. 今月の利用額の合計を計算
+    @total_payments_amount = current_user.payments.all_month_total_amount # ※後述のScope、または .sum(:amount) に変更
+    # もしエラーが出る場合は一旦、簡易的に以下にしてください
+    @total_payments_amount = current_user.payments.where(date: Time.zone.now.all_month).sum(:amount)
+
+    # 2. ユーザーが設定した最大HP（今月の自由なお金）を取得
+    allowance = @user.monthly_allowance || 0
+
+    # 3. アクティブな目標（死守する金額）を取得
+    active_target = current_user.targets.find_by(is_active: true)
+    @target_budget = active_target ? active_target.total_budget : 0
+
+    # 💡 4. コア演算ロジック：残りHP ＝ 最大HP － 死守する金額 － 今月の利用額
+    @remaining_hp = allowance - @target_budget - @total_payments_amount
   end
 end

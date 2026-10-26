@@ -1,5 +1,14 @@
 <div class="container mx-auto p-4" style="max-width: 600px; font-family: sans-serif; color: #374151;">
   
+  <!-- 💡 非同期（Turbo）でフラッシュメッセージだけをパッと差し替えるエリア -->
+  <div id="flash-messages">
+    <% flash.each do |message_type, message| %>
+      <div class="flash <%= message_type %>" style="background-color: #f0fdf4; color: #16a34a; padding: 0.75rem; border-radius: 0.375rem; border: 1px solid #bbf7d0; text-align: center; margin-bottom: 1rem; font-weight: bold;">
+        <%= message %>
+      </div>
+    <% end %>
+  </div>
+
   <!-- ヘッダーエリア -->
   <div class="flex justify-between items-center mb-6 p-4 rounded" style="background-color: #f3f4f6; display: flex; justify-content: space-between; align-items: center; border-radius: 0.5rem;">
     <div style="display: flex; align-items: center; gap: 1rem;">
@@ -8,12 +17,11 @@
     </div>
     <div style="display: flex; align-items: center; gap: 10px;">
       <!-- 💡 「今月の設定を修正」ボタン -->
-      <%= link_to "今月の設定を修正", registrations_step_path('allowance'), style: "background-color: #ffffff; color: #374151; border: 1px solid #d1d5db; padding: 0.375rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem; text-decoration: none; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.05);" %>
+      <%= link_to "今月の設定を修正", step1_onboardings_path, style: "background-color: #ffffff; color: #374151; border: 1px solid #d1d5db; padding: 0.375rem;" %>
       <%= link_to "ログアウト", destroy_user_session_path, data: { turbo_method: :delete }, style: "color: #ef4444; text-decoration: none; font-size: 0.875rem;" %>
     </div>
   </div>
 
- 
   <div id="meter-section">
     <!-- メーター表示エリア -->
     <div class="bg-white p-6 rounded shadow mb-6 text-center" style="background-color: #ffffff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; text-align: center;">
@@ -40,13 +48,22 @@
         <div style="color: #d97706; font-size: 0.75rem; display: flex; align-items: center; gap: 4px;">
           <span>⚠️ ここからピンチ</span>
         </div>
-        <div><%= allowance.to_fs(:delimited) %> 円</div>
+        <!-- 💡 設定した最大HPに安全にアクセス -->
+        <div><%= (@user.monthly_allowance || 0).to_fs(:delimited) %> 円</div>
       </div>
-    </div>
+    </div> <!-- 👈 閉じ忘れていたdivタグをここで綺麗に閉じました！ -->
 
-    <!-- 📝 今月の利用履歴一覧（ここに入れておくことで自動で一緒に増減します） -->
+    <!-- 📝 今月の利用履歴一覧 -->
     <div style="background-color: #ffffff; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
-      <h3 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.125rem; font-weight: bold;">📝 今月の利用履歴</h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="margin: 0; font-size: 1.125rem; font-weight: bold;">📝 今月の利用履歴</h3>
+        
+        <!-- 💡 記録を一括クリア（全削除）するボタン -->
+        <% if @user.payments.any? %>
+          <%= button_to "履歴を一括クリア", destroy_all_payments_path, method: :delete, form: { data: { turbo_confirm: "今月の利用履歴をすべてクリアしてもよろしいですか？" } }, style: "background: none; border: none; color: #ef4444; font-size: 0.875rem; cursor: pointer; text-decoration: underline; padding: 0;" %>
+        <% end %>
+      </div>
+
       <% if @user.payments.any? %>
         <ul style="list-style: none; padding: 0; margin: 0;">
           <% @user.payments.order(created_at: :desc).each do |payment| %>
@@ -64,13 +81,12 @@
       <% end %>
     </div>
   </div>
-  <!-- 💡 Turboエリアの終了位置 -->
 
   <!-- 出費手動入力フォーム -->
   <div class="bg-gray-50 p-4 rounded mb-6" style="background-color: #f9fafb; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
     <h3 class="font-bold mb-4" style="margin-top: 0; margin-bottom: 1rem; font-size: 1.125rem;">今月の利用額を入力</h3>
     
-    <%= form_with model: @payment, url: payments_path, local: true do |f| %>
+    <%= form_with model: @payment, url: payments_path do |f| %>
       <div style="margin-bottom: 1rem;">
         <label style="display: block; font-size: 0.875rem; font-weight: bold; margin-bottom: 0.25rem; color: #374151;">金額</label>
         <%= f.number_field :amount, style: "border: 1px solid #d1d5db; padding: 0.5rem; width: 100%; border-radius: 0.25rem; box-sizing: border-box;", placeholder: "金額のみ（例: 1500）", required: true %>
@@ -85,24 +101,22 @@
     <% end %>
 
     <label style="display: block; font-size: 0.875rem; font-weight: bold; margin-bottom: 0.5rem; color: #374151; margin-top: 1rem;">クイック入力</label>
-<div style="display: flex; gap: 8px; flex-wrap: wrap;">
-  <button type="button" onclick="fillForm(500, 'コンビニ')" style="background-color: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer; font-weight: 500; color: #374151;">コンビニ 500円</button>
-  <button type="button" onclick="fillForm(600, 'カフェ')" style="background-color: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer; font-weight: 500; color: #374151;">カフェ 600円</button>
-  <button type="button" onclick="fillForm(1200, 'ランチ')" style="background-color: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer; font-weight: 500; color: #374151;">ランチ 1,200円</button>
-</div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <button type="button" onclick="fillForm(500, 'コンビニ')" style="background-color: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer; font-weight: 500; color: #374151;">コンビニ 500円</button>
+      <button type="button" onclick="fillForm(600, 'カフェ')" style="background-color: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer; font-weight: 500; color: #374151;">カフェ 600円</button>
+      <button type="button" onclick="fillForm(1200, 'ランチ')" style="background-color: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer; font-weight: 500; color: #374151;">ランチ 1,200円</button>
+    </div>
 
+    <script>
+      function fillForm(amount, memo) {
+        const amountField = document.querySelector('input[type="number"]');
+        const memoField = document.querySelector('input[type="text"]');
 
-<script>
-  function fillForm(amount, memo) {
-    // フォーム内にある金額入力欄と用途入力欄の要素を自動で探
-    const amountField = document.querySelector('input[type="number"]');
-    const memoField = document.querySelector('input[type="text"]');
-
-    if (amountField) amountField.value = amount;
-    if (memoField) memoField.value = memo;
-  }
-</script>
-
+        if (amountField) amountField.value = amount;
+        if (memoField) memoField.value = memo;
+      }
+    </script>
+  </div>
 </div>
 
 

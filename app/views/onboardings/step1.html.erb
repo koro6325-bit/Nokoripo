@@ -1,0 +1,96 @@
+<div class="container mx-auto p-4" style="max-width: 600px; font-family: sans-serif; color: #374151;">
+  
+  <!-- ヘッダーエリア -->
+  <div class="flex justify-between items-center mb-6 p-4 rounded" style="background-color: #f3f4f6; display: flex; justify-content: space-between; align-items: center; border-radius: 0.5rem;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <h1 class="text-xl font-bold" style="margin: 0; font-size: 1.25rem;">Nokoripo</h1>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <div style="width: 24px; height: 24px; background-color: #d1d5db; border-radius: 50%;"></div>
+        <span style="font-size: 0.875rem; color: #374151; font-weight: bold;">ユーザー名</span>
+      </div>
+    </div>
+    <div>
+      <%= link_to "ログアウト", destroy_user_session_path, data: { turbo_method: :delete }, style: "color: #374151; background-color: #ffffff; border: 1px solid #d1d5db; text-decoration: none; font-size: 0.875rem; padding: 0.375rem 0.75rem; border-radius: 0.25rem;" %>
+    </div>
+  </div>
+
+  <p style="color: #9ca3af; font-size: 0.75rem; font-weight: bold; margin-bottom: 0.25rem; margin-left: 2rem;">ステップ1 / 2</p>
+
+<%= form_with model: @user, url: update_step1_onboardings_path, method: :patch, local: true do |f| %>
+  <!-- メイン入力カード -->
+  <div style="background-color: #ffffff; border: 2px solid #e5e7eb; border-radius: 1rem; padding: 2.5rem 2rem; margin-bottom: 1.5rem; position: relative;">
+    
+    <!-- 吹き出しメッセージエリア -->
+    <div style="text-align: center; margin-bottom: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 8px;">
+      <div style="background-color: #e5e7eb; padding: 0.5rem 1.5rem; border-radius: 0.25rem; font-weight: bold; font-size: 0.875rem; color: #374151;">
+        今月の最大HPは？
+      </div>
+      <div style="width: 28px; height: 28px; background-color: #00a3af; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">rs</div>
+    </div>
+
+    <!-- リアルタイムに変動する金額表示 -->
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <span id="hp-display" style="font-size: 2.25rem; font-weight: 800; color: #111827;">10</span>
+      <span style="font-size: 1.5rem; font-weight: 800; color: #111827;">万円</span>
+    </div>
+
+    <!-- 💡 本物のスライダーフォームに変形 -->
+    <div style="margin-bottom: 2.5rem; padding: 0 1rem;">
+      <%= f.range_field :monthly_allowance, id: "hp-slider", min: 1, max: 30, value: 10, style: "width: 100%; -webkit-appearance: none; background: #e5e7eb; height: 6px; border-radius: 9999px; outline: none;" %>
+    </div>
+
+    <!-- クイック選択ボタン -->
+    <div style="display: flex; justify-content: space-between; gap: 12px; padding: 0 1rem;">
+      <button type="button" onclick="selectHP(5)" style="flex: 1; background-color: #e5e7eb; border: none; padding: 0.75rem 0; border-radius: 0.25rem; font-weight: bold; color: #374151; cursor: pointer; font-size: 0.875rem;">5万円</button>
+      <button type="button" onclick="selectHP(10)" style="flex: 1; background-color: #e5e7eb; border: none; padding: 0.75rem 0; border-radius: 0.25rem; font-weight: bold; color: #374151; cursor: pointer; font-size: 0.875rem;">10万円</button>
+      <button type="button" onclick="selectHP(15)" style="flex: 1; background-color: #e5e7eb; border: none; padding: 0.75rem 0; border-radius: 0.25rem; font-weight: bold; color: #374151; cursor: pointer; font-size: 0.875rem;">15万円</button>
+    </div>
+  </div>
+
+  <!-- 下部ナビゲーションボタン（次へをSubmitに変更） -->
+  <div style="display: flex; justify-content: space-between; gap: 20px; padding: 0 1rem;">
+    <%= link_to "戻る", :back, style: "flex: 1; text-align: center; background-color: #e5e7eb; color: #374151; padding: 0.75rem 0; border-radius: 0.25rem; font-weight: bold; text-decoration: none; font-size: 0.875rem;" %>
+    <%= f.submit "次へ", style: "flex: 1; text-align: center; background-color: #3b82f6; color: white; padding: 0.75rem 0; border-radius: 0.25rem; font-weight: bold; font-size: 0.875rem; border: none; cursor: pointer;" %>
+  </div>
+<% end %>
+
+<!-- 💡 スライダーやクイックボタンと連動して数字をパッと変えるJavaScript -->
+<script>
+  const slider = document.getElementById('hp-slider');
+  const display = document.getElementById('hp-display');
+
+  // スライダーを動かしたときに数値を書き換える
+  slider.addEventListener('input', function() {
+    display.textContent = this.value;
+  });
+
+  // クイックボタンを押したときにスライダーと数値を連動させる
+  function selectHP(amount) {
+    slider.value = amount;
+    display.textContent = amount;
+  }
+</script>
+
+<!-- スライダーのツマミ（シークバー）の見た目をFigmaに寄せるための簡易スタイル -->
+<style>
+  #hp-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  #hp-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+</style>

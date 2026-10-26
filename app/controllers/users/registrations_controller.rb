@@ -1,9 +1,9 @@
-# app/controllers/users/registrations_controller.rb
 class Users::RegistrationsController < Devise::RegistrationsController
   protected
 
-  # サインアップ（アカウント作成）成功後のリダイレクト先をステップ1へ
+  # 新規登録成功後にステップ1へリダイレクト
   def after_sign_up_path_for(resource)
-    registrations_step_path(:allowance)
+    step1_onboardings_path
   end
 end
+
