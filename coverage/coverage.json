@@ -8,7 +8,7 @@
       "RSpec"
     ],
     "project_name": "Nokoripo",
-    "timestamp": "2026-10-26T05:16:08.246+00:00",
+    "timestamp": "2026-10-27T04:13:51.089+00:00",
     "root": "/nokoripo",
     "commit": null,
     "primary_coverage": "line",
@@ -18,134 +18,146 @@
   },
   "total": {
     "lines": {
-      "covered": 0,
-      "missed": 73,
-      "omitted": 72,
-      "total": 73,
-      "percent": 0.0,
-      "strength": 0.0
+      "covered": 53,
+      "missed": 77,
+      "omitted": 276,
+      "total": 130,
+      "percent": 40.76923076923077,
+      "strength": 1.0846153846153845
     }
   },
   "coverage": {
     "app/controllers/application_controller.rb": {
       "source": [
         "class ApplicationController < ActionController::Base",
-        "end"
-      ],
-      "lines": [
-        0,
-        null
-      ],
-      "lines_covered_percent": 0.0,
-      "covered_lines": 0,
-      "missed_lines": 1,
-      "omitted_lines": 1,
-      "total_lines": 1
-    },
-    "app/controllers/dashboards_controller.rb": {
-      "source": [
-        "# app/controllers/dashboards_controller.rb",
-        "class DashboardsController < ApplicationController",
-        "  before_action :authenticate_user! # ログイン必須",
+        "  before_action :configure_permitted_parameters, if: :devise_controller?",
         "",
-        "  def show",
-        "    @user = current_user",
-        "    ",
-        "    # 1. ユーザーが現在アクティブにしている目標（モチベ）を1つ取得",
-        "    @active_target = @user.targets.find_by(is_active: true)",
-        "    ",
-        "    # 2. ユーザーが今月使ったお金（payments）の合計額を計算",
-        "    # ※月跨ぎ自動リセットの考慮：Rails側で当月（今月1日〜末日）のデータのみを合計する",
-        "    @total_payments_amount = @user.payments.where(date: Time.current.all_month).sum(:amount)",
-        "    ",
-        "    # 3. 逆算残高メーターの演算ロジック（READMEより）",
-        "    # 残高 ＝ 当月の自由なお金 － 目標予算 － 今月の利用額合計",
-        "    if @active_target",
-        "      @remaining_hp = (@user.monthly_allowance || 0) - (@active_target.total_budget || 0) - @total_payments_amount",
-        "    else",
-        "      @remaining_hp = (@user.monthly_allowance || 0) - @total_payments_amount",
-        "    end",
+        "  protected",
         "",
-        "    # 新しく出費を入力するための空のオブジェクトを用意（Issue #12用）",
-        "    @payment = @user.payments.build",
+        "  def configure_permitted_parameters",
+        "    # 新規登録（サインアップ）時に追加のカラムを許可する",
+        "    devise_parameter_sanitizer.permit(:sign_up, keys: [:nickname, :monthly_allowance])",
+        "  end",
+        "",
+        "  # 💡【重要】Deviseの通常の新規登録が成功した後のリダイレクト先",
+        "  def after_sign_up_path_for(resource)",
+        "    # ルーティングで定義されている「オンボーディングのステップ2（目標設定）」へ進む",
+        "    step2_onboardings_path",
         "  end",
         "end"
       ],
       "lines": [
+        1,
+        1,
         null,
-        0,
-        0,
+        1,
         null,
-        0,
-        0,
-        null,
-        null,
-        0,
-        null,
-        null,
+        1,
         null,
         0,
         null,
         null,
         null,
-        0,
-        0,
-        null,
-        0,
-        null,
-        null,
+        1,
         null,
         0,
         null,
         null
       ],
-      "lines_covered_percent": 0.0,
-      "covered_lines": 0,
-      "missed_lines": 10,
-      "omitted_lines": 16,
-      "total_lines": 10
+      "lines_covered_percent": 71.42857142857143,
+      "covered_lines": 5,
+      "missed_lines": 2,
+      "omitted_lines": 9,
+      "total_lines": 7
+    },
+    "app/controllers/dashboards_controller.rb": {
+      "source": [
+        "class DashboardsController < ApplicationController",
+        "  before_action :authenticate_user!",
+        "",
+        "  def show",
+        "    # 💡 .includes(:payments) を追記して、ユーザーと一緒に利用履歴データも先読み（Eager Loading）します。",
+        "    # これにより、履歴をループ表示する際のN+1問題が完全に解消されます！",
+        "    @user = User.includes(:payments).find(current_user.id)",
+        "    ",
+        "    @payment = Payment.new ",
+        "    @active_target = @user.targets.find_by(is_active: true)",
+        "  end",
+        "end",
+        "",
+        ""
+      ],
+      "lines": [
+        1,
+        1,
+        null,
+        1,
+        null,
+        null,
+        5,
+        null,
+        5,
+        5,
+        null,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 6,
+      "missed_lines": 0,
+      "omitted_lines": 8,
+      "total_lines": 6
     },
     "app/controllers/onboardings_controller.rb": {
       "source": [
         "class OnboardingsController < ApplicationController",
-        "end"
-      ],
-      "lines": [
-        0,
-        null
-      ],
-      "lines_covered_percent": 0.0,
-      "covered_lines": 0,
-      "missed_lines": 1,
-      "omitted_lines": 1,
-      "total_lines": 1
-    },
-    "app/controllers/payments_controller.rb": {
-      "source": [
-        "class PaymentsController < ApplicationController",
         "  before_action :authenticate_user!",
         "",
-        "  def create",
-        "    # (既存のcreate処理のまま)",
-        "    @payment = current_user.payments.new(payment_params)",
-        "    @payment.date ||= Date.current",
-        "    if @payment.save",
-        "      redirect_to root_path, notice: \"支出を記録しました！\"",
+        "  def step1",
+        "    @user = current_user",
+        "  end",
+        "",
+        "  def update_step1",
+        "    @user = current_user",
+        "    # スライダー等は「万円」単位で送られてくるため、10000倍してDB（integer）に保存",
+        "    allowance_in_yen = params[:user][:monthly_allowance].to_i * 10000",
+        "",
+        "    if @user.update(monthly_allowance: allowance_in_yen)",
+        "      redirect_to step2_onboardings_path",
         "    else",
-        "      redirect_to root_path, alert: \"記録に失敗しました\"",
+        "      render :step1, status: :unprocessable_entity",
         "    end",
         "  end",
         "",
-        "  def destroy",
-        "    @payment = current_user.payments.find(params[:id])",
-        "    @payment.destroy",
-        "    redirect_to root_path, notice: \"記録を削除しました！\"",
+        "  def step2",
+        "    @target = current_user.targets.build",
+        "  end",
+        "",
+        "  def create_step2",
+        "    # ステップ2のフォームからデータを受け取り、Userに紐づけて保存",
+        "    @target = current_user.targets.build(target_params)",
+        "    @target.is_active = true",
+        "    ",
+        "    # 死守する金額も「万円」単位なので10000倍する",
+        "    if params[:target][:total_budget].present?",
+        "      @target.total_budget = params[:target][:total_budget].to_i * 10000",
+        "    end",
+        "",
+        "    if @target.save",
+        "      # 💡 ここでダッシュボード上部に表示される「バナー（通知）」をセットします！",
+        "      redirect_to dashboard_path, notice: \"初期設定が完了しました！現在の残りHPで死守していきましょう！\"",
+        "    else",
+        "      flash.now[:alert] = \"目標の設定に失敗しました。空欄がないか確認してください。\"",
+        "      render :step2, status: :unprocessable_entity",
+        "    end",
         "  end",
         "",
         "  private",
         "",
-        "  def payment_params",
-        "    params.require(:payment).permit(:amount, :memo, :date)",
+        "  def target_params",
+        "    # 本来は期限(deadline)も受け取りますが、MVPで簡易にするため一旦名前のみでも動くように許可",
+        "    params.require(:target).permit(:name)",
         "  end",
         "end",
         ""
@@ -155,25 +167,48 @@
         0,
         null,
         0,
-        null,
-        0,
-        0,
-        0,
-        0,
-        null,
-        0,
-        null,
-        null,
-        null,
-        0,
-        0,
-        0,
         0,
         null,
         null,
         0,
+        0,
         null,
         0,
+        null,
+        0,
+        0,
+        null,
+        0,
+        null,
+        null,
+        null,
+        0,
+        0,
+        null,
+        null,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        null,
+        null,
+        0,
+        null,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null,
+        null,
+        0,
+        null,
+        0,
+        null,
         0,
         null,
         null,
@@ -181,9 +216,156 @@
       ],
       "lines_covered_percent": 0.0,
       "covered_lines": 0,
-      "missed_lines": 15,
-      "omitted_lines": 12,
-      "total_lines": 15
+      "missed_lines": 24,
+      "omitted_lines": 26,
+      "total_lines": 24
+    },
+    "app/controllers/payments_controller.rb": {
+      "source": [
+        "class PaymentsController < ApplicationController",
+        "  before_action :authenticate_user!",
+        "  before_action :set_user",
+        "",
+        "  # 1秒手動入力・クイック入力",
+        "  def create",
+        "    @payment = @user.payments.build(payment_params)",
+        "    @payment.date = Date.current",
+        "",
+        "    if @payment.save",
+        "      flash.now[:notice] = \"出費を記録しました！\"",
+        "      render_turbo_stream",
+        "    else",
+        "      flash.now[:alert] = \"金額を正しく入力してください。\"",
+        "      render_turbo_stream_flash_only",
+        "    end",
+        "  end",
+        "",
+        "  # 履歴の単発削除",
+        "  def destroy",
+        "    payment = @user.payments.find(params[:id])",
+        "    payment.destroy",
+        "    flash.now[:notice] = \"記録を削除しました。\"",
+        "    render_turbo_stream",
+        "  end",
+        "",
+        "  # 履歴の一括クリア",
+        "  def destroy_all",
+        "    @user.payments.where(date: Time.current.all_month).destroy_all",
+        "    flash.now[:notice] = \"今月の履歴をすべてクリアしました。\"",
+        "    render_turbo_stream",
+        "  end",
+        "",
+        "  private",
+        "",
+        "  def set_user",
+        "    @user = current_user",
+        "  end",
+        "",
+        "  def payment_params",
+        "    params.require(:payment).permit(:amount, :memo)",
+        "  end",
+        "",
+        "  # 💡 メーター、履歴、フラッシュを一斉に非同期更新する共通メソッド",
+        "  def render_turbo_stream",
+        "    respond_to do |format|",
+        "      format.html { redirect_to dashboard_path }",
+        "      format.turbo_stream do",
+        "        render turbo_stream: [",
+        "          turbo_stream.update(\"meter-section\", partial: \"dashboards/meter_section\", locals: { user: @user }),",
+        "          turbo_stream.update(\"flash-messages\", partial: \"shared/flash\")",
+        "        ]",
+        "      end",
+        "    end",
+        "  end",
+        "",
+        "  # エラー時のフラッシュ更新用",
+        "  def render_turbo_stream_flash_only",
+        "    respond_to do |format|",
+        "      format.html { redirect_to dashboard_path }",
+        "      format.turbo_stream do",
+        "        render turbo_stream: turbo_stream.update(\"flash-messages\", partial: \"shared/flash\")",
+        "      end",
+        "    end",
+        "  end",
+        "end",
+        "",
+        ""
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        null,
+        null,
+        1,
+        2,
+        2,
+        null,
+        2,
+        2,
+        2,
+        null,
+        0,
+        0,
+        null,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0,
+        0,
+        0,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0,
+        0,
+        null,
+        null,
+        1,
+        null,
+        1,
+        2,
+        null,
+        null,
+        1,
+        2,
+        null,
+        null,
+        null,
+        1,
+        2,
+        4,
+        2,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0,
+        0,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 60.0,
+      "covered_lines": 21,
+      "missed_lines": 14,
+      "omitted_lines": 33,
+      "total_lines": 35
     },
     "app/controllers/registrations_steps_controller.rb": {
       "source": [
@@ -307,26 +489,247 @@
       "omitted_lines": 2,
       "total_lines": 2
     },
-    "app/controllers/users/registrations_controller.rb": {
+    "app/controllers/users/confirmations_controller.rb": {
       "source": [
-        "# app/controllers/users/registrations_controller.rb",
-        "class Users::RegistrationsController < Devise::RegistrationsController",
-        "  protected",
+        "# frozen_string_literal: true",
         "",
-        "  # サインアップ（アカウント作成）成功後のリダイレクト先をステップ1へ",
-        "  def after_sign_up_path_for(resource)",
-        "    registrations_step_path(:allowance)",
-        "  end",
+        "class Users::ConfirmationsController < Devise::ConfirmationsController",
+        "  # GET /resource/confirmation/new",
+        "  # def new",
+        "  #   super",
+        "  # end",
+        "",
+        "  # POST /resource/confirmation",
+        "  # def create",
+        "  #   super",
+        "  # end",
+        "",
+        "  # GET /resource/confirmation?confirmation_token=abcdef",
+        "  # def show",
+        "  #   super",
+        "  # end",
+        "",
+        "  # protected",
+        "",
+        "  # The path used after resending confirmation instructions.",
+        "  # def after_resending_confirmation_instructions_path_for(resource_name)",
+        "  #   super(resource_name)",
+        "  # end",
+        "",
+        "  # The path used after confirmation.",
+        "  # def after_confirmation_path_for(resource_name, resource)",
+        "  #   super(resource_name, resource)",
+        "  # end",
         "end"
       ],
       "lines": [
         null,
+        null,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 1,
+      "omitted_lines": 29,
+      "total_lines": 1
+    },
+    "app/controllers/users/omniauth_callbacks_controller.rb": {
+      "source": [
+        "# frozen_string_literal: true",
+        "",
+        "class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController",
+        "  # You should configure your model like this:",
+        "  # devise :omniauthable, omniauth_providers: [:twitter]",
+        "",
+        "  # You should also create an action method in this controller like this:",
+        "  # def twitter",
+        "  # end",
+        "",
+        "  # More info at:",
+        "  # https://github.com/heartcombo/devise#omniauth",
+        "",
+        "  # GET|POST /resource/auth/twitter",
+        "  # def passthru",
+        "  #   super",
+        "  # end",
+        "",
+        "  # GET|POST /users/auth/twitter/callback",
+        "  # def failure",
+        "  #   super",
+        "  # end",
+        "",
+        "  # protected",
+        "",
+        "  # The path used when OmniAuth fails",
+        "  # def after_omniauth_failure_path_for(scope)",
+        "  #   super(scope)",
+        "  # end",
+        "end"
+      ],
+      "lines": [
+        null,
+        null,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 1,
+      "omitted_lines": 29,
+      "total_lines": 1
+    },
+    "app/controllers/users/passwords_controller.rb": {
+      "source": [
+        "# frozen_string_literal: true",
+        "",
+        "class Users::PasswordsController < Devise::PasswordsController",
+        "  # GET /resource/password/new",
+        "  # def new",
+        "  #   super",
+        "  # end",
+        "",
+        "  # POST /resource/password",
+        "  # def create",
+        "  #   super",
+        "  # end",
+        "",
+        "  # GET /resource/password/edit?reset_password_token=abcdef",
+        "  # def edit",
+        "  #   super",
+        "  # end",
+        "",
+        "  # PUT /resource/password",
+        "  # def update",
+        "  #   super",
+        "  # end",
+        "",
+        "  # protected",
+        "",
+        "  # def after_resetting_password_path_for(resource)",
+        "  #   super(resource)",
+        "  # end",
+        "",
+        "  # The path used after sending reset password instructions",
+        "  # def after_sending_reset_password_instructions_path_for(resource_name)",
+        "  #   super(resource_name)",
+        "  # end",
+        "end"
+      ],
+      "lines": [
+        null,
+        null,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 1,
+      "omitted_lines": 33,
+      "total_lines": 1
+    },
+    "app/controllers/users/registrations_controller.rb": {
+      "source": [
+        "class Users::RegistrationsController < Devise::RegistrationsController",
+        "  protected",
+        "",
+        "  # 新規登録成功後にステップ1へリダイレクト",
+        "  def after_sign_up_path_for(resource)",
+        "    step1_onboardings_path",
+        "  end",
+        "end",
+        ""
+      ],
+      "lines": [
         0,
         0,
         null,
         null,
         0,
         0,
+        null,
         null,
         null
       ],
@@ -336,18 +739,154 @@
       "omitted_lines": 5,
       "total_lines": 4
     },
+    "app/controllers/users/sessions_controller.rb": {
+      "source": [
+        "# frozen_string_literal: true",
+        "",
+        "class Users::SessionsController < Devise::SessionsController",
+        "  # before_action :configure_sign_in_params, only: [:create]",
+        "",
+        "  # GET /resource/sign_in",
+        "  # def new",
+        "  #   super",
+        "  # end",
+        "",
+        "  # POST /resource/sign_in",
+        "  # def create",
+        "  #   super",
+        "  # end",
+        "",
+        "  # DELETE /resource/sign_out",
+        "  # def destroy",
+        "  #   super",
+        "  # end",
+        "",
+        "  # protected",
+        "",
+        "  # If you have extra params to permit, append them to the sanitizer.",
+        "  # def configure_sign_in_params",
+        "  #   devise_parameter_sanitizer.permit(:sign_in, keys: [:attribute])",
+        "  # end",
+        "end"
+      ],
+      "lines": [
+        null,
+        null,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 1,
+      "omitted_lines": 26,
+      "total_lines": 1
+    },
+    "app/controllers/users/unlocks_controller.rb": {
+      "source": [
+        "# frozen_string_literal: true",
+        "",
+        "class Users::UnlocksController < Devise::UnlocksController",
+        "  # GET /resource/unlock/new",
+        "  # def new",
+        "  #   super",
+        "  # end",
+        "",
+        "  # POST /resource/unlock",
+        "  # def create",
+        "  #   super",
+        "  # end",
+        "",
+        "  # GET /resource/unlock?unlock_token=abcdef",
+        "  # def show",
+        "  #   super",
+        "  # end",
+        "",
+        "  # protected",
+        "",
+        "  # The path used after sending unlock password instructions",
+        "  # def after_sending_unlock_instructions_path_for(resource)",
+        "  #   super(resource)",
+        "  # end",
+        "",
+        "  # The path used after unlocking the resource",
+        "  # def after_unlock_path_for(resource)",
+        "  #   super(resource)",
+        "  # end",
+        "end"
+      ],
+      "lines": [
+        null,
+        null,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 1,
+      "omitted_lines": 29,
+      "total_lines": 1
+    },
     "app/helpers/application_helper.rb": {
       "source": [
         "module ApplicationHelper",
         "end"
       ],
       "lines": [
-        0,
+        1,
         null
       ],
-      "lines_covered_percent": 0.0,
-      "covered_lines": 0,
-      "missed_lines": 1,
+      "lines_covered_percent": 100.0,
+      "covered_lines": 1,
+      "missed_lines": 0,
       "omitted_lines": 1,
       "total_lines": 1
     },
@@ -357,12 +896,12 @@
         "end"
       ],
       "lines": [
-        0,
+        1,
         null
       ],
-      "lines_covered_percent": 0.0,
-      "covered_lines": 0,
-      "missed_lines": 1,
+      "lines_covered_percent": 100.0,
+      "covered_lines": 1,
+      "missed_lines": 0,
       "omitted_lines": 1,
       "total_lines": 1
     },
@@ -372,12 +911,12 @@
         "end"
       ],
       "lines": [
-        0,
+        1,
         null
       ],
-      "lines_covered_percent": 0.0,
-      "covered_lines": 0,
-      "missed_lines": 1,
+      "lines_covered_percent": 100.0,
+      "covered_lines": 1,
+      "missed_lines": 0,
       "omitted_lines": 1,
       "total_lines": 1
     },
@@ -388,13 +927,13 @@
         "end"
       ],
       "lines": [
-        0,
-        0,
+        1,
+        1,
         null
       ],
-      "lines_covered_percent": 0.0,
-      "covered_lines": 0,
-      "missed_lines": 2,
+      "lines_covered_percent": 100.0,
+      "covered_lines": 2,
+      "missed_lines": 0,
       "omitted_lines": 1,
       "total_lines": 2
     },
@@ -422,13 +961,13 @@
         "end"
       ],
       "lines": [
-        0,
-        0,
+        1,
+        1,
         null
       ],
-      "lines_covered_percent": 0.0,
-      "covered_lines": 0,
-      "missed_lines": 2,
+      "lines_covered_percent": 100.0,
+      "covered_lines": 2,
+      "missed_lines": 0,
       "omitted_lines": 1,
       "total_lines": 2
     },
@@ -439,19 +978,18 @@
         "end"
       ],
       "lines": [
-        0,
-        0,
+        1,
+        1,
         null
       ],
-      "lines_covered_percent": 0.0,
-      "covered_lines": 0,
-      "missed_lines": 2,
+      "lines_covered_percent": 100.0,
+      "covered_lines": 2,
+      "missed_lines": 0,
       "omitted_lines": 1,
       "total_lines": 2
     },
     "app/models/user.rb": {
       "source": [
-        "# app/models/user.rb",
         "class User < ApplicationRecord",
         "  devise :database_authenticatable, :registerable,",
         "         :recoverable, :rememberable, :validatable",
@@ -460,38 +998,77 @@
         "  has_many :payments, dependent: :destroy",
         "  ",
         "  validates :monthly_allowance, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, on: :update",
+        "",
+        "  # 💡 ここから追記：逆算残高（残りHP）を計算するメソッド",
+        "  def remaining_hp",
+        "    # 1. 今月の自由なお金（未設定なら0）",
+        "    allowance = self.monthly_allowance || 0",
+        "    ",
+        "    # 2. 現在アクティブな目標の予算（システム内で常に1つ。未設定なら0）",
+        "    active_target_budget = self.targets.find_by(is_active: true)&.total_budget || 0",
+        "    ",
+        "    # 3. 今月のカード利用額の合計（「月跨ぎの挙動」要件に基づき、今月分のみを集計）",
+        "    current_month_payments_total = self.payments.where(date: Time.current.all_month).sum(:amount)",
+        "    ",
+        "    # 計算：最大HP - 死守する金額 - 今月の利用額",
+        "    allowance - active_target_budget - current_month_payments_total",
+        "  end",
+        "",
+        "  # 💡 ここから追記：画面の「今月はまだ 〇〇円 しか使ってないよ！」で使う、今月の利用総額",
+        "  def current_month_total_payments",
+        "    self.payments.where(date: Time.current.all_month).sum(:amount)",
+        "  end",
         "end",
         ""
       ],
       "lines": [
+        1,
+        1,
         null,
-        0,
-        0,
+        null,
+        1,
+        1,
+        null,
+        1,
         null,
         null,
-        0,
-        0,
+        1,
         null,
-        0,
+        15,
+        null,
+        null,
+        15,
+        null,
+        null,
+        15,
+        null,
+        null,
+        15,
+        null,
+        null,
+        null,
+        1,
+        9,
+        null,
         null,
         null
       ],
-      "lines_covered_percent": 0.0,
-      "covered_lines": 0,
-      "missed_lines": 5,
-      "omitted_lines": 6,
-      "total_lines": 5
+      "lines_covered_percent": 100.0,
+      "covered_lines": 12,
+      "missed_lines": 0,
+      "omitted_lines": 18,
+      "total_lines": 12
     }
   },
   "groups": {
     "Controllers": {
       "lines": {
-        "covered": 0,
-        "missed": 57,
-        "omitted": 59,
-        "total": 57,
-        "percent": 0.0,
-        "strength": 0.0
+        "covered": 32,
+        "missed": 75,
+        "omitted": 251,
+        "total": 107,
+        "percent": 29.906542056074766,
+        "strength": 0.5233644859813084
       },
       "files": [
         "app/controllers/application_controller.rb",
@@ -500,7 +1077,12 @@
         "app/controllers/payments_controller.rb",
         "app/controllers/registrations_steps_controller.rb",
         "app/controllers/top_controller.rb",
-        "app/controllers/users/registrations_controller.rb"
+        "app/controllers/users/confirmations_controller.rb",
+        "app/controllers/users/omniauth_callbacks_controller.rb",
+        "app/controllers/users/passwords_controller.rb",
+        "app/controllers/users/registrations_controller.rb",
+        "app/controllers/users/sessions_controller.rb",
+        "app/controllers/users/unlocks_controller.rb"
       ]
     },
     "Channels": {
@@ -516,12 +1098,12 @@
     },
     "Models": {
       "lines": {
-        "covered": 0,
-        "missed": 13,
-        "omitted": 10,
-        "total": 13,
-        "percent": 0.0,
-        "strength": 0.0
+        "covered": 18,
+        "missed": 2,
+        "omitted": 22,
+        "total": 20,
+        "percent": 90.0,
+        "strength": 4.1
       },
       "files": [
         "app/models/application_record.rb",
@@ -544,12 +1126,12 @@
     },
     "Helpers": {
       "lines": {
-        "covered": 0,
-        "missed": 3,
+        "covered": 3,
+        "missed": 0,
         "omitted": 3,
         "total": 3,
-        "percent": 0.0,
-        "strength": 0.0
+        "percent": 100.0,
+        "strength": 1.0
       },
       "files": [
         "app/helpers/application_helper.rb",
@@ -878,6 +1460,198 @@
         },
         "app/models/user.rb": {
           "line": 0.0
+        }
+      }
+    },
+    {
+      "created_at": "2026-10-27T04:02:32Z",
+      "branch": null,
+      "commit": null,
+      "totals": {
+        "line": 40.76
+      },
+      "groups": {
+        "Controllers": {
+          "line": 29.9
+        },
+        "Channels": {
+          "line": 100.0
+        },
+        "Models": {
+          "line": 90.0
+        },
+        "Mailers": {
+          "line": 100.0
+        },
+        "Helpers": {
+          "line": 100.0
+        },
+        "Views": {
+          "line": 100.0
+        },
+        "Jobs": {
+          "line": 100.0
+        },
+        "Libraries": {
+          "line": 100.0
+        }
+      },
+      "files": {
+        "app/controllers/application_controller.rb": {
+          "line": 71.42
+        },
+        "app/controllers/dashboards_controller.rb": {
+          "line": 100.0
+        },
+        "app/controllers/onboardings_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/payments_controller.rb": {
+          "line": 60.0
+        },
+        "app/controllers/registrations_steps_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/top_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/confirmations_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/omniauth_callbacks_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/passwords_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/registrations_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/sessions_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/unlocks_controller.rb": {
+          "line": 0.0
+        },
+        "app/helpers/application_helper.rb": {
+          "line": 100.0
+        },
+        "app/helpers/onboardings_helper.rb": {
+          "line": 100.0
+        },
+        "app/helpers/top_helper.rb": {
+          "line": 100.0
+        },
+        "app/models/application_record.rb": {
+          "line": 100.0
+        },
+        "app/models/goal.rb": {
+          "line": 0.0
+        },
+        "app/models/payment.rb": {
+          "line": 100.0
+        },
+        "app/models/target.rb": {
+          "line": 100.0
+        },
+        "app/models/user.rb": {
+          "line": 100.0
+        }
+      }
+    },
+    {
+      "created_at": "2026-10-27T04:13:51Z",
+      "branch": null,
+      "commit": null,
+      "totals": {
+        "line": 40.76
+      },
+      "groups": {
+        "Controllers": {
+          "line": 29.9
+        },
+        "Channels": {
+          "line": 100.0
+        },
+        "Models": {
+          "line": 90.0
+        },
+        "Mailers": {
+          "line": 100.0
+        },
+        "Helpers": {
+          "line": 100.0
+        },
+        "Views": {
+          "line": 100.0
+        },
+        "Jobs": {
+          "line": 100.0
+        },
+        "Libraries": {
+          "line": 100.0
+        }
+      },
+      "files": {
+        "app/controllers/application_controller.rb": {
+          "line": 71.42
+        },
+        "app/controllers/dashboards_controller.rb": {
+          "line": 100.0
+        },
+        "app/controllers/onboardings_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/payments_controller.rb": {
+          "line": 60.0
+        },
+        "app/controllers/registrations_steps_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/top_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/confirmations_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/omniauth_callbacks_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/passwords_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/registrations_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/sessions_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/users/unlocks_controller.rb": {
+          "line": 0.0
+        },
+        "app/helpers/application_helper.rb": {
+          "line": 100.0
+        },
+        "app/helpers/onboardings_helper.rb": {
+          "line": 100.0
+        },
+        "app/helpers/top_helper.rb": {
+          "line": 100.0
+        },
+        "app/models/application_record.rb": {
+          "line": 100.0
+        },
+        "app/models/goal.rb": {
+          "line": 0.0
+        },
+        "app/models/payment.rb": {
+          "line": 100.0
+        },
+        "app/models/target.rb": {
+          "line": 100.0
+        },
+        "app/models/user.rb": {
+          "line": 100.0
         }
       }
     }

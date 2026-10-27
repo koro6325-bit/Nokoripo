@@ -1,0 +1,5 @@
+<% flash.each do |message_type, message| %>
+  <div class="flash <%= message_type %>" style="background-color: #f0fdf4; color: #16a34a; padding: 0.75rem; border-radius: 0.375rem; border: 1px solid #bbf7d0; text-align: center; margin-bottom: 1rem; font-weight: bold;">
+    <%= message %>
+  </div>
+<% end %>

@@ -289,6 +289,198 @@
             "line": 0.0
           }
         }
+      },
+      {
+        "created_at": "2026-10-27T04:02:32Z",
+        "branch": null,
+        "commit": null,
+        "totals": {
+          "line": 40.76
+        },
+        "groups": {
+          "Controllers": {
+            "line": 29.9
+          },
+          "Channels": {
+            "line": 100.0
+          },
+          "Models": {
+            "line": 90.0
+          },
+          "Mailers": {
+            "line": 100.0
+          },
+          "Helpers": {
+            "line": 100.0
+          },
+          "Views": {
+            "line": 100.0
+          },
+          "Jobs": {
+            "line": 100.0
+          },
+          "Libraries": {
+            "line": 100.0
+          }
+        },
+        "files": {
+          "app/controllers/application_controller.rb": {
+            "line": 71.42
+          },
+          "app/controllers/dashboards_controller.rb": {
+            "line": 100.0
+          },
+          "app/controllers/onboardings_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/payments_controller.rb": {
+            "line": 60.0
+          },
+          "app/controllers/registrations_steps_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/top_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/users/confirmations_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/users/omniauth_callbacks_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/users/passwords_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/users/registrations_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/users/sessions_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/users/unlocks_controller.rb": {
+            "line": 0.0
+          },
+          "app/helpers/application_helper.rb": {
+            "line": 100.0
+          },
+          "app/helpers/onboardings_helper.rb": {
+            "line": 100.0
+          },
+          "app/helpers/top_helper.rb": {
+            "line": 100.0
+          },
+          "app/models/application_record.rb": {
+            "line": 100.0
+          },
+          "app/models/goal.rb": {
+            "line": 0.0
+          },
+          "app/models/payment.rb": {
+            "line": 100.0
+          },
+          "app/models/target.rb": {
+            "line": 100.0
+          },
+          "app/models/user.rb": {
+            "line": 100.0
+          }
+        }
+      },
+      {
+        "created_at": "2026-10-27T04:13:51Z",
+        "branch": null,
+        "commit": null,
+        "totals": {
+          "line": 40.76
+        },
+        "groups": {
+          "Controllers": {
+            "line": 29.9
+          },
+          "Channels": {
+            "line": 100.0
+          },
+          "Models": {
+            "line": 90.0
+          },
+          "Mailers": {
+            "line": 100.0
+          },
+          "Helpers": {
+            "line": 100.0
+          },
+          "Views": {
+            "line": 100.0
+          },
+          "Jobs": {
+            "line": 100.0
+          },
+          "Libraries": {
+            "line": 100.0
+          }
+        },
+        "files": {
+          "app/controllers/application_controller.rb": {
+            "line": 71.42
+          },
+          "app/controllers/dashboards_controller.rb": {
+            "line": 100.0
+          },
+          "app/controllers/onboardings_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/payments_controller.rb": {
+            "line": 60.0
+          },
+          "app/controllers/registrations_steps_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/top_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/users/confirmations_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/users/omniauth_callbacks_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/users/passwords_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/users/registrations_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/users/sessions_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/users/unlocks_controller.rb": {
+            "line": 0.0
+          },
+          "app/helpers/application_helper.rb": {
+            "line": 100.0
+          },
+          "app/helpers/onboardings_helper.rb": {
+            "line": 100.0
+          },
+          "app/helpers/top_helper.rb": {
+            "line": 100.0
+          },
+          "app/models/application_record.rb": {
+            "line": 100.0
+          },
+          "app/models/goal.rb": {
+            "line": 0.0
+          },
+          "app/models/payment.rb": {
+            "line": 100.0
+          },
+          "app/models/target.rb": {
+            "line": 100.0
+          },
+          "app/models/user.rb": {
+            "line": 100.0
+          }
+        }
       }
     ]
   }
