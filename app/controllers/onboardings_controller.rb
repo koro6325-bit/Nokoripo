@@ -7,7 +7,6 @@ class OnboardingsController < ApplicationController
 
   def update_step1
     @user = current_user
-    # スライダー等は「万円」単位で送られてくるため、10000倍してDB（integer）に保存
     allowance_in_yen = params[:user][:monthly_allowance].to_i * 10000
 
     if @user.update(monthly_allowance: allowance_in_yen)
@@ -22,11 +21,11 @@ class OnboardingsController < ApplicationController
   end
 
   def create_step2
-    # ステップ2のフォームからデータを受け取り、Userに紐づけて保存
     @target = current_user.targets.build(target_params)
     @target.is_active = true
     
-    # 死守する金額も「万円」単位なので10000倍する
+    @target.deadline = Date.current.end_of_month
+
     if params[:target][:total_budget].present?
       @target.total_budget = params[:target][:total_budget].to_i * 10000
     end
@@ -42,8 +41,8 @@ class OnboardingsController < ApplicationController
   private
 
   def target_params
-    # 本来は期限(deadline)も受け取りますが、MVPで簡易にするため一旦名前のみでも動くように許可
-    params.require(:target).permit(:name)
+    params.require(:target).permit(:name, :total_budget)
   end
 end
+
 
