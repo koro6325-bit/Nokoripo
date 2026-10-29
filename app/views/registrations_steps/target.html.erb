@@ -34,7 +34,7 @@
         </div>
       </div>
 
-      <!-- 💡 死守する金額のスライダーUI（1万円〜20万円まで5,000円刻み） -->
+      <!--  死守する金額のスライダーUI（1万円〜20万円まで5,000円刻み） -->
       <div style="margin-bottom: 1.5rem; padding: 0 2rem;">
         <%= f.range_field :total_budget, id: "target-slider", min: 10000, max: 200000, step: 5000, value: @target.total_budget || 50000, style: "width: 100%; accent-color: #3b82f6; cursor: pointer; height: 6px; background: #e5e7eb; border-radius: 9999px;" %>
       </div>
@@ -49,7 +49,7 @@
   <% end %>
 </div>
 
-<!-- 💡 スライダーの数値をリアルタイム連動させるJavaScript -->
+<!-- スライダーの数値をリアルタイム連動させるJavaScript -->
 <script>
   const targetSlider = document.getElementById('target-slider');
   const targetDisplay = document.getElementById('display-target-amount');

@@ -27,7 +27,7 @@ RSpec.describe "メイン画面でのメーター逆算とクイック入力機�
       find('input[placeholder="用途（例: コンビニ）"]').set("コンビニ")
       click_button "登録する"
 
-      # 💡 rack_test環境のフラッシュメッセージの仕様を考慮し、文言チェックのみスキップします
+      #  rack_test環境のフラッシュメッセージの仕様を考慮し、文言チェックのみスキップします
       # expect(page).to have_content "出費を記録しました！"
       
       expect(page).to have_content "49,500 円"

@@ -16,7 +16,7 @@ Rails.application.routes.draw do
 
   resource :dashboard, only: [:show]
 
-  # 💡 resources :payments の中に「一括クリア用のルート」を正しくネストさせます
+  #  resources :payments の中に「一括クリア用のルート」を正しくネストさせます
   resources :payments, only: [:create, :destroy] do
     collection do
       delete :destroy_all

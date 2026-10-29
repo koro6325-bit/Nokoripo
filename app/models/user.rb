@@ -7,7 +7,6 @@ class User < ApplicationRecord
   
   validates :monthly_allowance, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, on: :update
 
-  # 💡 ここから追記：逆算残高（残りHP）を計算するメソッド
   def remaining_hp
     # 1. 今月の自由なお金（未設定なら0）
     allowance = self.monthly_allowance || 0
@@ -22,7 +21,7 @@ class User < ApplicationRecord
     allowance - active_target_budget - current_month_payments_total
   end
 
-  # 💡 ここから追記：画面の「今月はまだ 〇〇円 しか使ってないよ！」で使う、今月の利用総額
+  
   def current_month_total_payments
     self.payments.where(date: Time.current.all_month).sum(:amount)
   end

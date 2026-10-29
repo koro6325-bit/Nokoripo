@@ -21,12 +21,12 @@
         <span style="font-size: 1.5rem; font-weight: bold; color: #111827; margin-left: 0.25rem;">円</span>
       </div>
 
-      <!-- 💡 スライダーUI（1万円〜30万円まで1,000円刻みで直感的に動かせます） -->
+      <!-- スライダーUI（1万円〜30万円まで1,000円刻みで直感的に動かせます） -->
       <div style="margin-bottom: 2.5rem; padding: 0 1rem;">
         <%= f.range_field :monthly_allowance, id: "allowance-slider", min: 10000, max: 300000, step: 1000, value: @user.monthly_allowance || 100000, style: "width: 100%; accent-color: #3b82f6; cursor: pointer; height: 6px; background: #e5e7eb; border-radius: 9999px;" %>
       </div>
 
-      <!-- 💡 クイック選択ボタン（押すとスライダーと中央の数字がその金額に一瞬で切り替わります） -->
+      <!-- クイック選択ボタン（押すとスライダーと中央の数字がその金額に一瞬で切り替わります） -->
       <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
         <button type="button" onclick="setAllowance(50000)" style="background-color: #e5e7eb; border: none; padding: 0.625rem 1.5rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer; font-weight: bold; color: #374151;">5万円</button>
         <button type="button" onclick="setAllowance(100000)" style="background-color: #e5e7eb; border: none; padding: 0.625rem 1.5rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer; font-weight: bold; color: #374151;">10万円</button>
@@ -43,7 +43,7 @@
   <% end %>
 </div>
 
-<!-- 💡 スライダーとボタンの数値をリアルタイム連動させる魔法のJavaScript -->
+<!--  スライダーとボタンの数値をリアルタイム連動させる魔法のJavaScript -->
 <script>
   const slider = document.getElementById('allowance-slider');
   const display = document.getElementById('display-amount');

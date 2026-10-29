@@ -32,7 +32,6 @@ class OnboardingsController < ApplicationController
     end
 
     if @target.save
-      # 💡 ここでダッシュボード上部に表示される「バナー（通知）」をセットします！
       redirect_to dashboard_path, notice: "初期設定が完了しました！現在の残りHPで死守していきましょう！"
     else
       flash.now[:alert] = "目標の設定に失敗しました。空欄がないか確認してください。"
