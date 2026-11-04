@@ -1,41 +1,42 @@
 <!-- メーター表示エリア -->
 <div class="bg-white p-6 rounded shadow mb-6 text-center" style="background-color: #ffffff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; text-align: center;">
-  <% allowance = user.monthly_allowance || 0 %>
-  <% active_target = user.targets.find_by(is_active: true) %>
-  <% target_budget = active_target ? active_target.total_budget : 0 %>
+  <% allowance = @user.monthly_allowance || 0 %>
+  <% target_budget = @active_target ? @active_target.total_budget : 0 %>
   
-  <% if user.remaining_hp < 0 %>
+  <% if @user.remaining_hp < 0 %>
     <h2 style="color: #dc2626; font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: bold;">予算オーバーしちゃってるよ！無駄遣いを控えよう！</h2>
-    <div style="color: #dc2626; font-size: 2.25rem; font-weight: 800; margin-bottom: 1.5rem;"><%= user.remaining_hp.to_fs(:delimited) %> 円</div>
+    <div style="color: #dc2626; font-size: 2.25rem; font-weight: 800; margin-bottom: 1.5rem;"><%= @user.remaining_hp.to_fs(:delimited) %> 円</div>
   <% else %>
-    <h2 style="color: #16a34a; font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: bold;">今月はまだ <%= user.current_month_total_payments.to_fs(:delimited) %> 円しか使ってないよ！</h2>
-    <div style="color: #16a34a; font-size: 2.25rem; font-weight: 800; margin-bottom: 1.5rem;">残りHP: <%= user.remaining_hp.to_fs(:delimited) %> 円</div>
+    <h2 style="color: #16a34a; font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: bold;">今月はまだ <%= @user.current_month_total_payments.to_fs(:delimited) %> 円しか使ってないよ！</h2>
+    <div style="color: #16a34a; font-size: 2.25rem; font-weight: 800; margin-bottom: 1.5rem;">残りHP: <%= @user.remaining_hp.to_fs(:delimited) %> 円</div>
   <% end %>
 
-  <!--  1. 割合の計算ロジック（出費進捗、および目標の固定位置） -->
-  <% progress_percentage = allowance > 0 ? ([(user.current_month_total_payments.to_f / allowance) * 100, 100].min) : 0 %>
-  <% target_percentage = allowance > 0 ? ([(target_budget.to_f / allowance) * 100, 100].min) : 0 %>
+  <!-- 正しい割合の計算ロジック（最大HPから目標予算を引いた「安全限界ライン」をパーセント化） -->
+  <% progress_percentage = allowance > 0 ? ([(@user.current_month_total_payments.to_f / allowance) * 100, 100].min) : 0 %>
+  <% safe_limit = allowance - target_budget %>
+  <% target_percentage = allowance > 0 ? ([ (safe_limit.to_f / allowance) * 100, 0 ].max) : 0 %>
+  <% target_percentage = [target_percentage, 100].min %>
 
-  <!--  2. 視覚的メーターバー（親要素に relative を指定し、内部に縦線を重ねます） -->
-  <div style="position: relative; width: 100%; background-color: #e5e7eb; height: 24px; border-radius: 9999px; margin: 1.5rem 0;">
+  <!-- 視覚的メーターバー（relative基準で、内部の進捗と縦線を連動） -->
+  <div style="position: relative; width: 100%; background-color: #e5e5e5; height: 24px; border-radius: 9999px; margin: 1.5rem 0 0.5rem 0;">
     
     <!-- 出費に応じて左から右へ伸びる進捗バー -->
-    <div style="width: <%= progress_percentage %>%; height: 100%; background-color: <%= user.remaining_hp < 0 ? '#ef4444' : '#10b981' %>; border-radius: 9999px; transition: width 0.5s ease;">
+    <div style="width: <%= progress_percentage %>%; height: 100%; background-color: <%= @user.remaining_hp < 0 ? '#ef4444' : '#10b981' %>; border-radius: 9999px; transition: width 0.5s ease;">
     </div>
 
-    <!-- 死守する金額の位置に引く「本番の縦線」 -->
-    <div style="position: absolute; right: <%= target_percentage %>%; top: -4px; width: 3px; height: 32px; background-color: #d97706; z-index: 10;">
+    <!-- 死守する金額（目標）に連動して位置が動く「本番の縦線」 -->
+    <div style="position: absolute; left: <%= target_percentage %>%; top: -4px; width: 3px; height: 32px; background-color: #d97706; z-index: 10; transition: left 0.5s ease;">
     </div>
   </div>
 
-  <!--  3. メーターの下の金額・警告ラベルエリア -->
-  <div style="position: relative; width: 100%; height: 32px; font-size: 0.875rem; font-weight: bold; color: #4b5563; margin-top: 0.5rem;">
+  <!-- メーターの下の金額・警告ラベルエリア（縦線の真下に文字をピタッと固定） -->
+  <div style="position: relative; width: 100%; height: 40px; font-size: 0.875rem; font-weight: bold; color: #4b5563; margin-top: 0.5rem;">
     <!-- 左端：0円 -->
     <div style="position: absolute; left: 0; top: 4px;">0 円</div>
     
-    <!--  縦線の真下にピタッと固定される「ここからピンチ」のテキスト -->
-    <div style="position: absolute; right: <%= target_percentage %>%; top: 4px; transform: translateX(50%); color: #d97706; font-size: 0.75rem; white-space: nowrap; font-weight: bold;">
-      ⚠️ ここからピンチ (<%= target_budget.to_fs(:delimited) %>円)
+    <!-- 縦線の真下にピタッと固定される「ここからピンチ」のテキスト -->
+    <div style="position: absolute; left: <%= target_percentage %>%; top: 4px; transform: translateX(-50%); color: #d97706; font-size: 0.75rem; white-space: nowrap; font-weight: bold; transition: left 0.5s ease; z-index: 5;">
+      ⚠️ ここからピンチ<br>(<%= target_budget.to_fs(:delimited) %>円)
     </div>
     
     <!-- 右端：最大HP -->
@@ -43,20 +44,47 @@
   </div>
 </div>
 
+<!-- 今月の利用額入力フォームエリア -->
+<div class="bg-white p-6 rounded shadow mb-6" style="background-color: #ffffff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
+  <h3 style="font-size: 1.125rem; font-weight: bold; margin-bottom: 1rem;">今月の利用額を入力</h3>
+  <%= form_with model: @payment, local: false do |f| %>
+    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 200px;">
+        <%= f.label :amount, "金額", style: "display: block; font-size: 0.875rem; font-weight: bold; margin-bottom: 0.25rem;" %>
+        <%= f.number_field :amount, placeholder: "金額のみ (例: 1500)", style: "width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;" %>
+      </div>
+      <div style="flex: 1; min-width: 200px;">
+        <%= f.label :memo, "用途", style: "display: block; font-size: 0.875rem; font-weight: bold; margin-bottom: 0.25rem;" %>
+        <%= f.text_field :memo, placeholder: "用途 (例: コンビニ)", style: "width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;" %>
+      </div>
+    </div>
+    <%= f.submit "登録する", style: "width: 100%; background-color: #3b82f6; color: white; padding: 0.75rem; border: none; border-radius: 0.375rem; font-weight: bold; cursor: pointer;" %>
+  <% end %>
 
-<!--  今月の利用履歴一覧 -->
+  <!-- クイック入力ボタン -->
+  <div style="margin-top: 1.5rem;">
+    <h4 style="font-size: 0.875rem; font-weight: bold; color: #4b5563; margin-bottom: 0.5rem;">🚀 クイック入力</h4>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <%= button_to "コンビニ 500円", payments_path(payment: { amount: 500, memo: "コンビニ" }), remote: true, style: "background-color: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: bold; cursor: pointer; color: #374151;" %>
+      <%= button_to "カフェ 600円", payments_path(payment: { amount: 600, memo: "カフェ" }), remote: true, style: "background-color: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: bold; cursor: pointer; color: #374151;" %>
+      <%= button_to "ランチ 1,200円", payments_path(payment: { amount: 1200, memo: "ランチ" }), remote: true, style: "background-color: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: bold; cursor: pointer; color: #374151;" %>
+    </div>
+  </div>
+</div>
+
+<!--  今月の利用履歴一覧-->
 <div style="background-color: #ffffff; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
     <h3 style="margin: 0; font-size: 1.125rem; font-weight: bold;">📝 今月の利用履歴</h3>
     
-    <% if user.payments.any? %>
+    <% if @user.payments.any? %>
       <%= button_to "履歴を一括クリア", destroy_all_payments_path, method: :delete, form: { data: { turbo_confirm: "今月の利用履歴をすべてクリアしてもよろしいですか？" } }, style: "background: none; border: none; color: #ef4444; font-size: 0.875rem; cursor: pointer; text-decoration: underline; padding: 0;" %>
     <% end %>
   </div>
 
-  <% if user.payments.any? %>
+  <% if @user.payments.any? %>
     <ul style="list-style: none; padding: 0; margin: 0;">
-      <% user.payments.order(created_at: :desc).each do |payment| %>
+      <% @user.payments.order(created_at: :desc).each do |payment| %>
         <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6;">
           <div>
             <span style="font-weight: bold; margin-right: 0.5rem;"><%= payment.amount.to_fs(:delimited) %> 円</span>
@@ -70,3 +98,5 @@
     <p style="color: #9ca3af; font-size: 0.875rem; text-align: center; margin: 1rem 0;">まだ今月の利用記録はありません。</p>
   <% end %>
 </div>
+
+

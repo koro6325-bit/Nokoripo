@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit(:sign_up, keys: [:nickname, :monthly_allowance])
   end
 
-  # 💡【重要】Deviseの通常の新規登録が成功した後のリダイレクト先
+  # Deviseの通常の新規登録が成功した後のリダイレクト先
   def after_sign_up_path_for(resource)
     # ルーティングで定義されている「オンボーディングのステップ2（目標設定）」へ進む
     step2_onboardings_path
