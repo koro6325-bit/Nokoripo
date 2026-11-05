@@ -1,3 +1,4 @@
+
 <div class="container mx-auto p-4" style="max-width: 1400px; width: 95%; font-family: sans-serif; color: #374151;">
   
   <!-- 非同期（Turbo）でフラッシュメッセージだけをパッと差し替えるエリア -->
@@ -17,48 +18,9 @@
     </div>
   </div>
 
-  <!--  メーター・履歴リスト
+  <!-- メーター・履歴リスト（フォームもこの中に正しく入っています） -->
   <div id="meter-section" style="width: 100%;">
     <%= render "dashboards/meter_section", user: @user %>
-  </div>
-
-  <!-- 出費手動入力フォーム-->
-  <div class="bg-gray-50 p-6 rounded mb-6" style="background-color: #f9fafb; padding: 2.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box;">
-    <h3 class="font-bold mb-4" style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.25rem; color: #111827;">今月の利用額を入力</h3>
-    
-    <%= form_with model: @payment, url: payments_path do |f| %>
-      <div style="display: flex; gap: 2rem; margin-bottom: 1.5rem; flex-wrap: wrap; width: 100%;">
-        <div style="flex: 1; min-width: 300px;">
-          <label style="display: block; font-size: 0.95rem; font-weight: bold; margin-bottom: 0.5rem; color: #374151;">金額</label>
-          <%= f.number_field :amount, style: "border: 1px solid #d1d5db; padding: 0.85rem; width: 100%; border-radius: 0.375rem; box-sizing: border-box; font-size: 1rem; shadow: inset 0 1px 2px rgba(0,0,0,0.05);", placeholder: "金額のみ（例: 1500）", required: true %>
-        </div>
-
-        <div style="flex: 1; min-width: 300px;">
-          <label style="display: block; font-size: 0.95rem; font-weight: bold; margin-bottom: 0.5rem; color: #374151;">用途</label>
-          <%= f.text_field :memo, style: "border: 1px solid #d1d5db; padding: 0.85rem; width: 100%; border-radius: 0.375rem; box-sizing: border-box; font-size: 1rem; shadow: inset 0 1px 2px rgba(0,0,0,0.05);", placeholder: "用途（例: コンビニ）" %>
-        </div>
-      </div>
-
-      <%= f.submit "登録する", style: "background-color: #3b82f6; color: white; padding: 0.85rem; border: none; border-radius: 0.375rem; width: 100%; font-weight: bold; cursor: pointer; font-size: 1.05rem; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(59,130,246,0.2), 0 2px 4px -1px rgba(59,130,246,0.06); transition: background-color 0.2s;" %>
-    <% end %>
-
-    <!-- クイック入力セクション -->
-    <label style="display: block; font-size: 0.95rem; font-weight: bold; margin-bottom: 1rem; color: #374151;">🚀 クイック入力</label>
-    <div style="display: flex; gap: 16px; flex-wrap: wrap; width: 100%;">
-      <button type="button" onclick="fillForm(500, 'コンビニ')" style="background-color: #e5e7eb; border: none; padding: 0.85rem 1.75rem; border-radius: 0.375rem; font-size: 0.95rem; cursor: pointer; font-weight: bold; color: #374151; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">コンビニ 500円</button>
-      <button type="button" onclick="fillForm(600, 'カフェ')" style="background-color: #e5e7eb; border: none; padding: 0.85rem 1.75rem; border-radius: 0.375rem; font-size: 0.95rem; cursor: pointer; font-weight: bold; color: #374151; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">カフェ 600円</button>
-      <button type="button" onclick="fillForm(1200, 'ランチ')" style="background-color: #e5e7eb; border: none; padding: 0.85rem 1.75rem; border-radius: 0.375rem; font-size: 0.95rem; cursor: pointer; font-weight: bold; color: #374151; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">ランチ 1,200円</button>
-    </div>
-
-    <script>
-      function fillForm(amount, memo) {
-        const amountField = document.querySelector('input[type="number"]');
-        const memoField = document.querySelector('input[type="text"]');
-
-        if (amountField) amountField.value = amount;
-        if (memoField) memoField.value = memo;
-      }
-    </script>
   </div>
 </div>
 
