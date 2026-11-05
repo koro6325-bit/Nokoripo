@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-# サーバー起動前にマイグレーションを実行
-bundle exec rails db:migrate
+# 本番環境の初期化とマイグレーションを同時に安全に実行
+bundle exec rails db:prepare
 
-# 渡されたコマンド（CMD）を実行
+# サーバー（CMD）を起動
 exec "$@"

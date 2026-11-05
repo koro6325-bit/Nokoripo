@@ -33,4 +33,5 @@ production:
   database: nokoripo_production
   username: nokoripo
   password: <%= ENV["NOKORIPO_DATABASE_PASSWORD"] %>
+  url: <%= ENV['DATABASE_URL'] %>
 
