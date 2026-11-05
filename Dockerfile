@@ -8,30 +8,19 @@ RUN apt-get update -qq && apt-get install -y \
 RUN mkdir /nokoripo
 WORKDIR /nokoripo
 
-
 COPY Gemfile /nokoripo/Gemfile
 COPY Gemfile.lock /nokoripo/Gemfile.lock
-
-
 RUN bundle install
 
+# アプリ本体をコンテナ内にコピー（これがないとマイグレーションファイルが届きません）
+COPY . /nokoripo
 
 COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
-ENTRYPOINT ["entrypoint.sh"]
 
+ENTRYPOINT ["entrypoint.sh"]
 EXPOSE 3000
-
-
-CMD ["rails", "server", "-b", "0.0.0.0"]
-
-# (既存のDockerfileの記述の最後のほうに追記します)
-
-# entrypoint.shをコピーして実行権限を付与
-COPY entrypoint.sh /usr/bin/
-RUN chmod +x /usr/bin/entrypoint.sh
-
-ENTRYPOINT ["entrypoint.sh"]
 CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
+
 
 
