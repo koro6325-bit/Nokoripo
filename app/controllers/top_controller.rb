@@ -1,9 +1,8 @@
 class TopController < ApplicationController
   def index
     
-    ActiveRecord::Tasks::DatabaseTasks.migrate
+    ActiveRecord::Base.connection.migration_context.migrate
 
     
   end
 end
-
