@@ -1,9 +1,8 @@
 #!/bin/bash
 set -e
 
-# 既存の server.pid があれば削除
-rm -f /nokoripo/tmp/pids/server.pid
-
+# サーバー起動前にマイグレーションを実行
 bundle exec rails db:migrate
-exec "$@"
 
+# 渡されたコマンド（CMD）を実行
+exec "$@"

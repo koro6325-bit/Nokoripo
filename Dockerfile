@@ -25,3 +25,13 @@ EXPOSE 3000
 
 CMD ["rails", "server", "-b", "0.0.0.0"]
 
+# (既存のDockerfileの記述の最後のほうに追記します)
+
+# entrypoint.shをコピーして実行権限を付与
+COPY entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
+
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
+
+
