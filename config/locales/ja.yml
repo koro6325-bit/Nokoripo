@@ -1,0 +1,71 @@
+---
+ja:
+  errors:
+    format: "%{attribute}%{message}"
+    messages:
+      accepted: を受諾してください
+      blank: を入力してください
+      confirmation: と%{attribute}の入力が一致しません
+      empty: を入力してください
+      equal_to: は%{count}にしてください
+      even: は偶数にしてください
+      exclusion: は予約されています
+      greater_than: は%{count}より大きい値にしてください
+      greater_than_or_equal_to: は%{count}以上の値にしてください
+      inclusion: は一覧にありません
+      invalid: は不正な値です
+      less_than: は%{count}より小さい値にしてください
+      less_than_or_equal_to: は%{count}以下の値にしてください
+      model_invalid: 'バリデーションに失敗しました: %{errors}'
+      not_a_number: は数値で入力してください
+      not_an_integer: は整数で入力してください
+      odd: は奇数にしてください
+      other_than: は%{count}以外の値にしてください
+      present: は入力しないでください
+      required: を入力してください
+      taken: はすでに存在します
+      too_long: は%{count}文字以内で入力してください
+      too_short: は%{count}文字以上で入力してください
+      wrong_length: は%{count}文字で入力してください
+      not_saved:
+        one: エラーが発生したため %{resource} は保存されませんでした。
+        other: "%{count} 件のエラーが発生したため %{resource} は保存されませんでした。"
+  activerecord:
+    models:
+      user: ユーザー
+      target: 目標
+      payment: 利用記録
+    attributes:
+      user:
+        nickname: ニックネーム
+        email: メールアドレス
+        password: パスワード
+        password_confirmation: パスワード（確認用）
+        monthly_allowance: 今月の自由なお金
+      target:
+        name: 目標の名前
+        total_budget: 総予算
+        deadline: 目標期限
+        is_active: 有効状態
+      payment:
+        amount: 使った金額
+        memo: メモ・用途
+        date: 使用日
+  devise:
+    failure:
+      already_authenticated: すでにログインしています。
+      inactive: アカウントが有効化されていません。
+      invalid: "%{authentication_keys}またはパスワードが違います。"
+      locked: アカウントは凍結されています。
+      not_found_in_database: "%{authentication_keys}またはパスワードが違います。"
+      timeout: セッションがタイムアウトしました。もう一度ログインしてください。
+      unauthenticated: ログインもしくはアカウント登録してください。
+      unconfirmed: メールアドレスの本人確認が必要です。
+    registrations:
+      destroyed: アカウントを削除しました。
+      signed_up: アカウント登録が完了しました。
+      updated: アカウント情報を変更しました。
+    sessions:
+      signed_in: ログインしました。
+      signed_out: ログアウトしました。
+      already_signed_out: 既にログアウト済みです。
